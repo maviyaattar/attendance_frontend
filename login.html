@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Login to the Smart Location Based Attendance System." />
+  <title>Login – SmartAttend</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="gradient-bg">
+
+  <!-- Toast container -->
+  <div class="toast-container-custom" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ── Navbar ─────────────────────────────────────────────────── -->
+  <nav class="navbar navbar-expand-lg navbar-custom" aria-label="Main navigation">
+    <div class="container">
+      <a class="navbar-brand-custom" href="index.html" aria-label="SmartAttend home">
+        <i class="bi bi-geo-alt-fill"></i>
+        SmartAttend
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <a class="nav-link-custom" href="login.html">Login</a>
+        <a class="btn-primary-custom" href="register.html">Register</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Login Section ──────────────────────────────────────────── -->
+  <main class="auth-bg" style="padding-top:5rem;">
+    <div class="auth-card glass-card animate-fade-up">
+
+      <!-- Header -->
+      <div class="text-center mb-4">
+        <i class="bi bi-person-circle auth-logo text-gradient" aria-hidden="true"></i>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Sign in to access your attendance dashboard</p>
+      </div>
+
+      <!-- Error Alert -->
+      <div id="loginAlert" class="alert-custom error" role="alert" style="display:none;">
+        <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+        <span id="loginAlertMsg">Invalid credentials. Please try again.</span>
+      </div>
+
+      <!-- Success Alert -->
+      <div id="loginSuccess" class="alert-custom success" role="status" style="display:none;">
+        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+        <span>Login successful! Redirecting…</span>
+      </div>
+
+      <!-- Form -->
+      <form id="loginForm" novalidate aria-label="Login form">
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label class="form-label-custom" for="loginEmail">Email Address</label>
+          <div class="form-floating-custom input-wrap">
+            <i class="bi bi-envelope input-icon" aria-hidden="true"></i>
+            <input
+              type="email"
+              id="loginEmail"
+              class="form-control-custom"
+              placeholder="you@college.edu"
+              autocomplete="email"
+              required
+              aria-required="true"
+              aria-describedby="loginEmailError"
+            />
+          </div>
+          <div id="loginEmailError" class="invalid-feedback-custom" role="alert">
+            Please enter a valid email address.
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-4">
+          <label class="form-label-custom" for="loginPassword">Password</label>
+          <div class="form-floating-custom password-wrap">
+            <i class="bi bi-lock input-icon" aria-hidden="true"></i>
+            <input
+              type="password"
+              id="loginPassword"
+              class="form-control-custom"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+              aria-required="true"
+              aria-describedby="loginPasswordError"
+            />
+            <button type="button" class="password-toggle" id="toggleLoginPwd"
+                    aria-label="Toggle password visibility">
+              <i class="bi bi-eye" id="toggleLoginPwdIcon"></i>
+            </button>
+          </div>
+          <div id="loginPasswordError" class="invalid-feedback-custom" role="alert">
+            Password is required.
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn-primary-custom w-100 justify-content-center" id="loginBtn">
+          <span id="loginBtnText"><i class="bi bi-box-arrow-in-right me-1"></i>Sign In</span>
+          <span id="loginSpinner" style="display:none;">
+            <span class="spinner-custom me-1" aria-hidden="true"></span> Signing in…
+          </span>
+        </button>
+
+      </form>
+
+      <div class="auth-divider">
+        <span>New here?</span>
+      </div>
+
+      <a href="register.html" class="btn-outline-custom w-100 justify-content-center">
+        <i class="bi bi-person-plus me-1"></i> Create Student Account
+      </a>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-custom" role="contentinfo">
+    <div class="container">
+      <p>&copy; <span id="footerYear"></span> <span class="text-gradient fw-600">SmartAttend</span></p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- API -->
+  <script src="js/api.js"></script>
+
+  <script>
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+    /* ── Password toggle ── */
+    const toggleBtn  = document.getElementById('toggleLoginPwd');
+    const pwdInput   = document.getElementById('loginPassword');
+    const toggleIcon = document.getElementById('toggleLoginPwdIcon');
+
+    toggleBtn.addEventListener('click', () => {
+      const isText = pwdInput.type === 'text';
+      pwdInput.type = isText ? 'password' : 'text';
+      toggleIcon.className = isText ? 'bi bi-eye' : 'bi bi-eye-slash';
+    });
+
+    /* ── Toast helper ── */
+    function showToast(msg, type = 'info') {
+      const icons = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', info: 'bi-info-circle-fill' };
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast-custom ${type}`;
+      el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+      el.innerHTML = `
+        <i class="bi ${icons[type] || icons.info} toast-icon" aria-hidden="true"></i>
+        <span class="toast-msg">${msg}</span>
+        <button class="toast-close" aria-label="Close notification">&times;</button>
+      `;
+      el.querySelector('.toast-close').addEventListener('click', () => el.remove());
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4500);
+    }
+
+    /* ── Inline validation helpers ── */
+    function setError(inputId, errorId, show) {
+      const input = document.getElementById(inputId);
+      const err   = document.getElementById(errorId);
+      if (show) {
+        input.classList.add('is-invalid');
+        input.classList.remove('is-valid');
+        err.classList.add('show');
+        input.setAttribute('aria-invalid', 'true');
+      } else {
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+        err.classList.remove('show');
+        input.setAttribute('aria-invalid', 'false');
+      }
+    }
+
+    function validateForm() {
+      let valid = true;
+      const email    = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      setError('loginEmail', 'loginEmailError', !emailOk);
+      if (!emailOk) valid = false;
+
+      setError('loginPassword', 'loginPasswordError', password.length === 0);
+      if (password.length === 0) valid = false;
+
+      return valid;
+    }
+
+    /* ── Form submit ── */
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!validateForm()) return;
+
+      const loginAlert   = document.getElementById('loginAlert');
+      const loginSuccess = document.getElementById('loginSuccess');
+      const loginBtn     = document.getElementById('loginBtn');
+      const loginBtnText = document.getElementById('loginBtnText');
+      const loginSpinner = document.getElementById('loginSpinner');
+
+      // Reset state
+      loginAlert.style.display   = 'none';
+      loginSuccess.style.display = 'none';
+
+      // Loading state
+      loginBtn.disabled        = true;
+      loginBtnText.style.display = 'none';
+      loginSpinner.style.display = 'inline-flex';
+
+      const payload = {
+        email:    document.getElementById('loginEmail').value.trim(),
+        password: document.getElementById('loginPassword').value,
+      };
+
+      const result = await loginUser(payload);
+
+      loginBtn.disabled        = false;
+      loginBtnText.style.display = 'inline-flex';
+      loginSpinner.style.display = 'none';
+
+      if (result.ok) {
+        loginSuccess.style.display = 'flex';
+        showToast('Login successful! Redirecting…', 'success');
+        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+      } else {
+        loginAlert.style.display = 'flex';
+        document.getElementById('loginAlertMsg').textContent =
+          result.message || 'Invalid credentials. Please try again.';
+        showToast(result.message || 'Login failed', 'error');
+      }
+    });
+
+    /* ── Live validation on blur ── */
+    document.getElementById('loginEmail').addEventListener('blur', () => {
+      const val = document.getElementById('loginEmail').value.trim();
+      if (val) setError('loginEmail', 'loginEmailError', !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val));
+    });
+    document.getElementById('loginPassword').addEventListener('blur', () => {
+      if (document.getElementById('loginPassword').value)
+        setError('loginPassword', 'loginPasswordError', false);
+    });
+  </script>
+
+</body>
+</html>

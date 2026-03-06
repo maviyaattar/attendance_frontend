@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Smart Location Based Attendance System – mark college attendance automatically using GPS." />
+  <title>Smart Attendance System</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="gradient-bg">
+
+  <!-- ── Navbar ─────────────────────────────────────────────────── -->
+  <nav class="navbar navbar-expand-lg navbar-custom fixed-top" aria-label="Main navigation">
+    <div class="container">
+      <a class="navbar-brand-custom" href="index.html" aria-label="Smart Attendance home">
+        <i class="bi bi-geo-alt-fill"></i>
+        SmartAttend
+      </a>
+
+      <button class="navbar-toggler border-0 text-white" type="button"
+              data-bs-toggle="collapse" data-bs-target="#mainNav"
+              aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <i class="bi bi-list fs-3"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-center gap-2">
+          <li class="nav-item">
+            <a class="nav-link-custom active" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link-custom" href="login.html">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="btn-primary-custom" href="register.html">Get Started</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Hero Section ───────────────────────────────────────────── -->
+  <section class="hero-section" id="hero">
+    <div class="container">
+      <div class="row align-items-center gy-5">
+
+        <!-- Left column -->
+        <div class="col-lg-6">
+          <span class="hero-badge">
+            <i class="bi bi-geo-alt me-1"></i> GPS-Powered Attendance
+          </span>
+
+          <h1 class="hero-title">
+            <span class="highlight">Smart Location</span><br />
+            Based Attendance<br />System
+          </h1>
+
+          <p class="hero-desc">
+            Effortlessly track and manage college attendance with real-time GPS
+            verification. Secure, transparent, and hassle-free — no more proxies.
+          </p>
+
+          <div class="hero-buttons">
+            <a href="login.html" class="btn-primary-custom">
+              <i class="bi bi-box-arrow-in-right"></i> Login
+            </a>
+            <a href="register.html" class="btn-outline-custom">
+              <i class="bi bi-person-plus"></i> Register
+            </a>
+          </div>
+        </div>
+
+        <!-- Right column – illustration card -->
+        <div class="col-lg-6 d-flex justify-content-center">
+          <div class="hero-image-wrap">
+            <div class="glass-card hero-img-card">
+              <i class="bi bi-geo-alt-fill hero-icon-large" aria-hidden="true"></i>
+              <h4 class="fw-bold mb-2">Location Verified</h4>
+              <p class="text-muted-light mb-0" style="font-size:.9rem;">
+                Your attendance is recorded only when you're inside the campus boundary.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /row -->
+    </div>
+  </section>
+
+  <!-- ── Features Section ───────────────────────────────────────── -->
+  <section class="py-5 py-lg-6" id="features" aria-label="System features">
+    <div class="container">
+
+      <div class="text-center mb-5">
+        <h2 class="fw-800 fs-2 mb-2">
+          Why <span class="text-gradient">SmartAttend?</span>
+        </h2>
+        <p class="text-muted-light mx-auto" style="max-width:500px;">
+          Designed specifically for colleges to reduce manual effort and prevent proxy attendance.
+        </p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Feature 1 -->
+        <div class="col-sm-6 col-lg-3" style="animation-delay:.05s">
+          <div class="glass-card feature-card">
+            <div class="feature-icon purple">
+              <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+            </div>
+            <h5>GPS Verification</h5>
+            <p>Validates your physical presence on campus before recording attendance.</p>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="col-sm-6 col-lg-3" style="animation-delay:.1s">
+          <div class="glass-card feature-card">
+            <div class="feature-icon blue">
+              <i class="bi bi-shield-lock-fill" aria-hidden="true"></i>
+            </div>
+            <h5>Secure & Tamper-proof</h5>
+            <p>Token-based authentication ensures only verified students can mark attendance.</p>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="col-sm-6 col-lg-3" style="animation-delay:.15s">
+          <div class="glass-card feature-card">
+            <div class="feature-icon green">
+              <i class="bi bi-bar-chart-fill" aria-hidden="true"></i>
+            </div>
+            <h5>Live Analytics</h5>
+            <p>Instantly view attendance percentage and detailed subject-wise records.</p>
+          </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="col-sm-6 col-lg-3" style="animation-delay:.2s">
+          <div class="glass-card feature-card">
+            <div class="feature-icon pink">
+              <i class="bi bi-phone-fill" aria-hidden="true"></i>
+            </div>
+            <h5>Mobile Friendly</h5>
+            <p>Fully responsive interface – mark attendance from any device, anywhere.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── How It Works ───────────────────────────────────────────── -->
+  <section class="py-5" id="how-it-works" aria-label="How it works">
+    <div class="container">
+      <div class="text-center mb-5">
+        <h2 class="fw-800 fs-2 mb-2">How It <span class="text-gradient">Works</span></h2>
+        <p class="text-muted-light">Three simple steps to mark your attendance</p>
+      </div>
+
+      <div class="row g-4 justify-content-center">
+        <div class="col-md-4">
+          <div class="glass-card feature-card">
+            <div class="feature-icon blue mx-auto mb-3" style="font-size:1.4rem;">
+              <span class="fw-bold fs-5">1</span>
+            </div>
+            <h5>Register &amp; Login</h5>
+            <p>Create your student profile with your college ID and personal details.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="glass-card feature-card">
+            <div class="feature-icon purple mx-auto mb-3" style="font-size:1.4rem;">
+              <span class="fw-bold fs-5">2</span>
+            </div>
+            <h5>Allow Location</h5>
+            <p>Grant location permission so the system can verify you're on campus.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="glass-card feature-card">
+            <div class="feature-icon green mx-auto mb-3" style="font-size:1.4rem;">
+              <span class="fw-bold fs-5">3</span>
+            </div>
+            <h5>Mark Attendance</h5>
+            <p>Tap the button — your GPS-verified attendance is recorded instantly.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── CTA Banner ─────────────────────────────────────────────── -->
+  <section class="py-5" aria-label="Call to action">
+    <div class="container">
+      <div class="glass-card p-4 p-lg-5 text-center">
+        <h3 class="fw-bold fs-2 mb-3">
+          Ready to ditch the <span class="text-gradient">paper register?</span>
+        </h3>
+        <p class="text-muted-light mb-4" style="max-width:480px; margin:auto;">
+          Join thousands of students already using SmartAttend for seamless, location-verified attendance.
+        </p>
+        <a href="register.html" class="btn-primary-custom" style="font-size:1rem; padding:.9rem 2.5rem;">
+          <i class="bi bi-person-plus-fill me-1"></i> Create Student Account
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ─────────────────────────────────────────────────── -->
+  <footer class="footer-custom" role="contentinfo">
+    <div class="container">
+      <p>
+        &copy; <span id="footerYear"></span>
+        <span class="text-gradient fw-600">SmartAttend</span>
+        &mdash; Smart Location Based Attendance System
+      </p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Set current year in footer
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
