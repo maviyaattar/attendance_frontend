@@ -6,33 +6,28 @@
  *   POST /api/register
  *   POST /api/login
  *   POST /api/mark-attendance
- *   GET  /api/student-dashboard
+ *   GET  /api/dashboard/{student_id}
  */
 
-const API_BASE = '';   // same-origin; set to 'http://localhost:5000' during local dev if needed
+import { API_BASE } from '../config.js';
 
 /* ── Helpers ─────────────────────────────────────────────────────── */
 
 /**
- * Return JSON headers, adding Bearer token when present.
+ * Return JSON headers.
  * @returns {Record<string, string>}
  */
-function _authHeaders() {
-  const token = localStorage.getItem('attendance_token');
-  const headers = { 'Content-Type': 'application/json' };
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-  return headers;
+function _jsonHeaders() {
+  return { 'Content-Type': 'application/json', 'Accept': 'application/json' };
 }
 
 /**
  * Persist auth data returned by the server.
- * @param {{ token?: string, student?: object }} data
+ * @param {{ student_id?: string, student?: object }} data
  */
 function _saveSession(data) {
-  if (data.token) {
-    localStorage.setItem('attendance_token', data.token);
+  if (data.student_id) {
+    localStorage.setItem('student_id', data.student_id);
   }
   if (data.student) {
     localStorage.setItem('attendance_student', JSON.stringify(data.student));
@@ -43,7 +38,7 @@ function _saveSession(data) {
  * Read saved student info.
  * @returns {object|null}
  */
-function getStudentInfo() {
+export function getStudentInfo() {
   try {
     const raw = localStorage.getItem('attendance_student');
     return raw ? JSON.parse(raw) : null;
@@ -55,8 +50,8 @@ function getStudentInfo() {
 /**
  * Clear session data.
  */
-function clearSession() {
-  localStorage.removeItem('attendance_token');
+export function clearSession() {
+  localStorage.removeItem('student_id');
   localStorage.removeItem('attendance_student');
 }
 
@@ -74,9 +69,9 @@ function _getLocation() {
       (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
       (err) => {
         let msg = 'Could not retrieve your location.';
-        if (err.code === err.PERMISSION_DENIED)  msg = 'Location permission denied. Please allow location access and try again.';
+        if (err.code === err.PERMISSION_DENIED)    msg = 'Location permission denied. Please allow location access and try again.';
         if (err.code === err.POSITION_UNAVAILABLE) msg = 'Location information is unavailable.';
-        if (err.code === err.TIMEOUT)            msg = 'Location request timed out.';
+        if (err.code === err.TIMEOUT)              msg = 'Location request timed out.';
         reject(new Error(msg));
       },
       { timeout: 10000, maximumAge: 0 }
@@ -127,13 +122,13 @@ async function _request(url, options = {}) {
 
 /**
  * Register a new student.
- * @param {{ fullName: string, email: string, collegeId: string, rollNumber: string, branch: string, password: string }} payload
+ * @param {{ name: string, email: string, college_id: string, roll_number: string, branch: string, password: string }} payload
  * @returns {Promise<{ok: boolean, data: any, message: string}>}
  */
-async function registerUser(payload) {
+export async function registerUser(payload) {
   return _request('/api/register', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: _jsonHeaders(),
     body: JSON.stringify(payload),
   });
 }
@@ -143,10 +138,10 @@ async function registerUser(payload) {
  * @param {{ email: string, password: string }} payload
  * @returns {Promise<{ok: boolean, data: any, message: string}>}
  */
-async function loginUser(payload) {
+export async function loginUser(payload) {
   const result = await _request('/api/login', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: _jsonHeaders(),
     body: JSON.stringify(payload),
   });
 
@@ -162,7 +157,12 @@ async function loginUser(payload) {
  * Automatically captures device location before sending.
  * @returns {Promise<{ok: boolean, data: any, message: string}>}
  */
-async function markAttendance() {
+export async function markAttendance() {
+  const studentId = localStorage.getItem('student_id');
+  if (!studentId) {
+    return { ok: false, data: {}, message: 'Not logged in. Please log in again.' };
+  }
+
   let location;
   try {
     location = await _getLocation();
@@ -172,11 +172,11 @@ async function markAttendance() {
 
   return _request('/api/mark-attendance', {
     method: 'POST',
-    headers: _authHeaders(),
+    headers: _jsonHeaders(),
     body: JSON.stringify({
-      latitude: location.latitude,
-      longitude: location.longitude,
-      timestamp: new Date().toISOString(),
+      student_id: studentId,
+      latitude:   location.latitude,
+      longitude:  location.longitude,
     }),
   });
 }
@@ -185,9 +185,13 @@ async function markAttendance() {
  * Fetch student dashboard data (profile + attendance stats + history).
  * @returns {Promise<{ok: boolean, data: any, message: string}>}
  */
-async function getDashboardData() {
-  return _request('/api/student-dashboard', {
+export async function getDashboardData() {
+  const studentId = localStorage.getItem('student_id');
+  if (!studentId) {
+    return { ok: false, data: {}, message: 'Not logged in. Please log in again.' };
+  }
+  return _request(`/api/dashboard/${studentId}`, {
     method: 'GET',
-    headers: _authHeaders(),
+    headers: _jsonHeaders(),
   });
 }
