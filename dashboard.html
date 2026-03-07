@@ -254,6 +254,8 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Shared config (API_BASE) -->
+  <script src="config.js"></script>
   <!-- API -->
   <script src="js/api.js"></script>
 
@@ -266,10 +268,9 @@
       now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
     /* ── Auth guard ── */
-    const token   = localStorage.getItem('attendance_token');
-    const student = getStudentInfo();
+    const studentId = localStorage.getItem('student_id');
 
-    if (!token || !student) {
+    if (!studentId) {
       window.location.href = 'login.html';
     }
 
@@ -293,17 +294,18 @@
     /* ── Populate profile from localStorage first (instant) ── */
     function populateFromLocal(s) {
       if (!s) return;
-      const name = s.fullName || s.name || 'Student';
+      const name = s.name || s.fullName || 'Student';
       document.getElementById('welcomeName').textContent    = name.split(' ')[0];
       document.getElementById('navStudentName').textContent = name.split(' ')[0];
       document.getElementById('profileName').textContent    = name;
       document.getElementById('profileEmail').textContent   = s.email || '—';
-      document.getElementById('profileRoll').textContent    = s.rollNumber || s.roll_number || '—';
-      document.getElementById('profileCollegeId').textContent = s.collegeId || s.college_id || '—';
+      document.getElementById('profileRoll').textContent    = s.roll_number || s.rollNumber || '—';
+      document.getElementById('profileCollegeId').textContent = s.college_id || s.collegeId || '—';
       document.getElementById('profileBranch').textContent  = s.branch || '—';
       document.getElementById('profileAvatar').textContent  = name.charAt(0).toUpperCase();
     }
 
+    const student = getStudentInfo();
     if (student) populateFromLocal(student);
 
     /* ── Update progress ring ── */
@@ -427,10 +429,11 @@
       spinner.style.display = 'none';
 
       if (result.ok) {
-        showToast('Attendance marked successfully! ✅', 'success');
+        showToast('Attendance Marked ✅', 'success');
         setTimeout(loadDashboard, 800);
       } else {
-        showToast(result.message || 'Failed to mark attendance', 'error');
+        const isOutside = /outside|location|boundary|not within/i.test(result.message || '');
+        showToast(isOutside ? 'Outside College Location' : (result.message || 'Failed to mark attendance'), 'error');
       }
     });
 

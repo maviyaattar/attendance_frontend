@@ -6,10 +6,10 @@
  *   POST /api/register
  *   POST /api/login
  *   POST /api/mark-attendance
- *   GET  /api/student-dashboard
+ *   GET  /api/dashboard/{student_id}
  */
 
-const API_BASE = '';   // same-origin; set to 'http://localhost:5000' during local dev if needed
+// API_BASE is declared in config.js and loaded before this script.
 
 /* ── Helpers ─────────────────────────────────────────────────────── */
 
@@ -28,7 +28,7 @@ function _authHeaders() {
 
 /**
  * Persist auth data returned by the server.
- * @param {{ token?: string, student?: object }} data
+ * @param {{ token?: string, student?: object, student_id?: string|number }} data
  */
 function _saveSession(data) {
   if (data.token) {
@@ -36,6 +36,11 @@ function _saveSession(data) {
   }
   if (data.student) {
     localStorage.setItem('attendance_student', JSON.stringify(data.student));
+  }
+  // Persist student_id – may come top-level or nested inside student object
+  const sid = data.student_id ?? data.student?.id ?? data.student?.student_id;
+  if (sid != null) {
+    localStorage.setItem('student_id', String(sid));
   }
 }
 
@@ -58,6 +63,7 @@ function getStudentInfo() {
 function clearSession() {
   localStorage.removeItem('attendance_token');
   localStorage.removeItem('attendance_student');
+  localStorage.removeItem('student_id');
 }
 
 /**
@@ -127,7 +133,7 @@ async function _request(url, options = {}) {
 
 /**
  * Register a new student.
- * @param {{ fullName: string, email: string, collegeId: string, rollNumber: string, branch: string, password: string }} payload
+ * @param {{ name: string, email: string, college_id: string, roll_number: string, branch: string, password: string }} payload
  * @returns {Promise<{ok: boolean, data: any, message: string}>}
  */
 async function registerUser(payload) {
@@ -170,13 +176,18 @@ async function markAttendance() {
     return { ok: false, data: {}, message: geoErr.message };
   }
 
+  const student_id = localStorage.getItem('student_id');
+  if (!student_id) {
+    return { ok: false, data: {}, message: 'Session expired. Please log in again.' };
+  }
+
   return _request('/api/mark-attendance', {
     method: 'POST',
-    headers: _authHeaders(),
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
+      student_id,
       latitude: location.latitude,
       longitude: location.longitude,
-      timestamp: new Date().toISOString(),
     }),
   });
 }
@@ -186,8 +197,12 @@ async function markAttendance() {
  * @returns {Promise<{ok: boolean, data: any, message: string}>}
  */
 async function getDashboardData() {
-  return _request('/api/student-dashboard', {
+  const student_id = localStorage.getItem('student_id');
+  if (!student_id) {
+    return { ok: false, data: {}, message: 'Session expired. Please log in again.' };
+  }
+  return _request(`/api/dashboard/${student_id}`, {
     method: 'GET',
-    headers: _authHeaders(),
+    headers: { 'Content-Type': 'application/json' },
   });
 }
