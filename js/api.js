@@ -241,7 +241,7 @@ function _adminHeaders() {
 
 /**
  * Login as admin.
- * @param {{ username: string, password: string }} payload
+ * @param {{ email: string, password: string }} payload
  * @returns {Promise<{ok: boolean, data: any, message: string}>}
  */
 async function adminLogin(payload) {
