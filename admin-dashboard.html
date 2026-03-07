@@ -38,13 +38,18 @@
           </a>
         </li>
         <li>
-          <a href="students.html">
+          <a href="manage-classes.html">
+            <i class="bi bi-journal-bookmark"></i> Classes
+          </a>
+        </li>
+        <li>
+          <a href="students-list.html">
             <i class="bi bi-people"></i> Students
           </a>
         </li>
         <li>
-          <a href="analytics.html">
-            <i class="bi bi-bar-chart-line"></i> Analytics
+          <a href="attendance-report.html">
+            <i class="bi bi-clipboard-data"></i> Attendance Report
           </a>
         </li>
       </ul>
@@ -141,14 +146,14 @@
               </div>
             </div>
 
-            <!-- Average Attendance -->
+            <!-- Absent Students -->
             <div class="col-6 col-xl-3">
               <div class="glass-card admin-stat-card animate-fade-up" style="animation-delay:.2s;">
                 <div class="card-icon" style="background:rgba(247,37,133,0.2); color:var(--accent);">
-                  <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+                  <i class="bi bi-person-x-fill" aria-hidden="true"></i>
                 </div>
-                <div class="card-value" id="statAvg">—</div>
-                <div class="card-label">Avg Attendance %</div>
+                <div class="card-value" id="statAbsent">—</div>
+                <div class="card-label">Absent Students</div>
               </div>
             </div>
 
@@ -158,20 +163,42 @@
           <div class="row g-3 animate-fade-up" style="animation-delay:.25s;">
             <div class="col-md-6">
               <div class="glass-card p-4">
-                <h5 class="mb-3"><i class="bi bi-people me-2" style="color:var(--primary);" aria-hidden="true"></i>Students</h5>
+                <h5 class="mb-3"><i class="bi bi-journal-bookmark me-2" style="color:var(--primary);" aria-hidden="true"></i>Classes</h5>
                 <p class="text-muted-light mb-3" style="font-size:.9rem;">
-                  View and search the complete list of enrolled students with their attendance records.
+                  Create and manage classes. Set subjects, assign teachers, and define schedules.
                 </p>
-                <a href="students.html" class="btn-primary-custom" style="font-size:.88rem; padding:.6rem 1.5rem;">
+                <a href="manage-classes.html" class="btn-primary-custom" style="font-size:.88rem; padding:.6rem 1.5rem;">
+                  <i class="bi bi-arrow-right me-1"></i> Manage Classes
+                </a>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="glass-card p-4">
+                <h5 class="mb-3"><i class="bi bi-clipboard-data me-2" style="color:var(--secondary);" aria-hidden="true"></i>Attendance Report</h5>
+                <p class="text-muted-light mb-3" style="font-size:.9rem;">
+                  View full attendance logs by date, export to CSV, and filter records.
+                </p>
+                <a href="attendance-report.html" class="btn-outline-custom" style="font-size:.88rem; padding:.6rem 1.5rem;">
+                  <i class="bi bi-arrow-right me-1"></i> View Report
+                </a>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="glass-card p-4">
+                <h5 class="mb-3"><i class="bi bi-people me-2" style="color:var(--success);" aria-hidden="true"></i>Students</h5>
+                <p class="text-muted-light mb-3" style="font-size:.9rem;">
+                  View the complete list of enrolled students with their details.
+                </p>
+                <a href="students-list.html" class="btn-outline-custom" style="font-size:.88rem; padding:.6rem 1.5rem;">
                   <i class="bi bi-arrow-right me-1"></i> View Students
                 </a>
               </div>
             </div>
             <div class="col-md-6">
               <div class="glass-card p-4">
-                <h5 class="mb-3"><i class="bi bi-bar-chart-line me-2" style="color:var(--secondary);" aria-hidden="true"></i>Analytics</h5>
+                <h5 class="mb-3"><i class="bi bi-bar-chart-line me-2" style="color:var(--warning);" aria-hidden="true"></i>Analytics</h5>
                 <p class="text-muted-light mb-3" style="font-size:.9rem;">
-                  Explore attendance trends by branch, date, and individual student performance.
+                  Explore attendance trends by branch, date, and individual performance.
                 </p>
                 <a href="analytics.html" class="btn-outline-custom" style="font-size:.88rem; padding:.6rem 1.5rem;">
                   <i class="bi bi-arrow-right me-1"></i> View Analytics
@@ -209,7 +236,7 @@
       new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 
     /* ── Auth guard ── */
-    if (!localStorage.getItem('admin_token')) {
+    if (!localStorage.getItem('admin_token') || localStorage.getItem('role') !== 'admin') {
       window.location.href = 'admin-login.html';
     }
 
@@ -272,7 +299,7 @@
       document.getElementById('errorState').style.display   = 'none';
       document.getElementById('dashContent').style.display  = 'none';
 
-      const result = await getAdminDashboard();
+      const result = await getAdminTodayAttendance();
 
       document.getElementById('loadingState').style.display = 'none';
 
@@ -288,13 +315,13 @@
 
       const totalStudents = d.totalStudents   ?? d.total_students   ?? 0;
       const totalClasses  = d.totalClasses    ?? d.total_classes    ?? 0;
-      const todayAtt      = d.todayAttendance ?? d.today_attendance ?? 0;
-      const avgAtt        = parseFloat(d.averageAttendance ?? d.average_attendance ?? 0).toFixed(1);
+      const todayAtt      = d.todayAttendance ?? d.today_attendance ?? d.present ?? 0;
+      const absentStudents = d.absentStudents ?? d.absent_students  ?? d.absent  ?? 0;
 
       animateCount(document.getElementById('statStudents'), totalStudents);
       animateCount(document.getElementById('statClasses'),  totalClasses);
       animateCount(document.getElementById('statToday'),    todayAtt);
-      document.getElementById('statAvg').textContent = avgAtt + '%';
+      animateCount(document.getElementById('statAbsent'),   absentStudents);
     }
 
     /* ── Logout ── */

@@ -1366,3 +1366,112 @@ body {
   font-size: 0.78rem;
   font-weight: 600;
 }
+
+/* ================================================================
+   Role Tab Switcher (Login Page)
+   ================================================================ */
+
+.role-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.role-tab {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted-light);
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.role-tab:not(:last-child) {
+  border-right: 1.5px solid rgba(255, 255, 255, 0.15);
+}
+
+.role-tab:hover {
+  background: rgba(108, 99, 255, 0.1);
+  color: #fff;
+}
+
+.role-tab.active {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff;
+}
+
+/* ================================================================
+   Admin Form Input (date/text inputs for admin pages)
+   ================================================================ */
+
+.admin-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: var(--transition);
+}
+
+.admin-input:focus {
+  border-color: var(--primary);
+  background: rgba(108, 99, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+}
+
+.admin-input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.5);
+  cursor: pointer;
+}
+
+/* ================================================================
+   Classes Card (manage-classes page)
+   ================================================================ */
+
+.class-card {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: var(--transition);
+}
+
+.class-card:last-child {
+  border-bottom: none;
+}
+
+.class-card:hover {
+  background: rgba(108, 99, 255, 0.06);
+}
+
+.class-card-title {
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.class-card-meta {
+  font-size: 0.83rem;
+  color: var(--text-muted-light);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.class-card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
