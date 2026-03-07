@@ -268,11 +268,7 @@
       now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
     /* ── Auth guard ── */
-    const studentId = localStorage.getItem('student_id');
-
-    if (!studentId || localStorage.getItem('role') !== 'student') {
-      window.location.href = 'login.html';
-    }
+    guardStudent();
 
     /* ── Toast helper ── */
     function showToast(msg, type = 'info') {

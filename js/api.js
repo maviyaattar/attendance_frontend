@@ -381,11 +381,7 @@ function getAdminAttendanceReport(date) {
  * Triggers a file download in the browser.
  */
 function exportAttendanceCsv() {
-  const token = localStorage.getItem('admin_token');
-  const url   = API_BASE + '/api/admin/export';
-  const a = document.createElement('a');
-  a.href = url + (token ? `?token=${encodeURIComponent(token)}` : '');
-  // Also set Authorization header via fetch and blob download as fallback
+  const url = API_BASE + '/api/admin/export';
   fetch(url, { method: 'GET', headers: _adminHeaders() })
     .then((res) => {
       if (!res.ok) throw new Error(`Export failed (${res.status})`);
