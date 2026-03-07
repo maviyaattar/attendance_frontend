@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Admin Dashboard – Smart Location Based Attendance System." />
+  <title>Admin Dashboard – SmartAttend</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="admin-body">
+
+  <!-- Toast container -->
+  <div class="toast-container-custom" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <div class="admin-layout">
+
+    <!-- ── Sidebar ─────────────────────────────────────────────── -->
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
+      <a class="sidebar-brand" href="admin-dashboard.html" aria-label="SmartAttend Admin home">
+        <i class="bi bi-geo-alt-fill"></i>
+        SmartAttend
+      </a>
+
+      <div class="sidebar-label">Main Menu</div>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="admin-dashboard.html" class="active" aria-current="page">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="students.html">
+            <i class="bi bi-people"></i> Students
+          </a>
+        </li>
+        <li>
+          <a href="analytics.html">
+            <i class="bi bi-bar-chart-line"></i> Analytics
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-logout">
+        <button id="logoutBtn" class="btn-outline-custom w-100 justify-content-center"
+                style="font-size:.88rem; padding:.6rem 1rem;" aria-label="Logout">
+          <i class="bi bi-box-arrow-left me-1"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── Main Content ──────────────────────────────────────────── -->
+    <div class="admin-main">
+
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title">
+          <i class="bi bi-speedometer2 me-2" style="color:var(--primary);" aria-hidden="true"></i>
+          Admin Dashboard
+        </div>
+        <span style="font-size:.82rem; color:var(--text-muted-light);" id="topbarDate"></span>
+      </header>
+
+      <!-- Content -->
+      <div class="admin-content">
+
+        <!-- Loading state -->
+        <div id="loadingState" class="page-loading" aria-live="polite" aria-label="Loading dashboard">
+          <div class="spinner-custom" style="width:40px; height:40px; border-width:4px;" aria-hidden="true"></div>
+          <p class="text-muted-light">Loading dashboard…</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="errorState" style="display:none;" class="page-loading" aria-live="polite">
+          <div class="glass-card p-4 text-center" style="max-width:400px;">
+            <i class="bi bi-exclamation-triangle-fill" style="font-size:2.5rem; color:var(--danger); display:block; margin-bottom:1rem;" aria-hidden="true"></i>
+            <p id="errorMsg" class="text-muted-light mb-3">Failed to load dashboard data.</p>
+            <button class="btn-primary-custom" onclick="loadDashboard()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Retry
+            </button>
+          </div>
+        </div>
+
+        <!-- Dashboard content -->
+        <div id="dashContent" style="display:none;">
+
+          <!-- Welcome row -->
+          <div class="dashboard-header animate-fade-down" style="padding:1.5rem 0 1rem; margin-bottom:1.5rem;">
+            <h2 class="fw-700 mb-1">
+              Welcome, <span class="text-gradient">Admin</span> 👋
+            </h2>
+            <p class="text-muted-light mb-0" style="font-size:.9rem;">
+              Here's what's happening in your institution today.
+            </p>
+          </div>
+
+          <!-- Stats cards -->
+          <div class="row g-3 mb-4">
+
+            <!-- Total Students -->
+            <div class="col-6 col-xl-3">
+              <div class="glass-card admin-stat-card animate-fade-up" style="animation-delay:.05s;">
+                <div class="card-icon" style="background:rgba(108,99,255,0.2); color:var(--primary);">
+                  <i class="bi bi-people-fill" aria-hidden="true"></i>
+                </div>
+                <div class="card-value text-gradient" id="statStudents">—</div>
+                <div class="card-label">Total Students</div>
+              </div>
+            </div>
+
+            <!-- Total Classes -->
+            <div class="col-6 col-xl-3">
+              <div class="glass-card admin-stat-card animate-fade-up" style="animation-delay:.1s;">
+                <div class="card-icon" style="background:rgba(72,202,228,0.2); color:var(--secondary);">
+                  <i class="bi bi-calendar3-fill" aria-hidden="true"></i>
+                </div>
+                <div class="card-value" id="statClasses">—</div>
+                <div class="card-label">Total Classes</div>
+              </div>
+            </div>
+
+            <!-- Today's Attendance -->
+            <div class="col-6 col-xl-3">
+              <div class="glass-card admin-stat-card animate-fade-up" style="animation-delay:.15s;">
+                <div class="card-icon" style="background:rgba(6,214,160,0.2); color:var(--success);">
+                  <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+                </div>
+                <div class="card-value" id="statToday">—</div>
+                <div class="card-label">Today's Attendance</div>
+              </div>
+            </div>
+
+            <!-- Average Attendance -->
+            <div class="col-6 col-xl-3">
+              <div class="glass-card admin-stat-card animate-fade-up" style="animation-delay:.2s;">
+                <div class="card-icon" style="background:rgba(247,37,133,0.2); color:var(--accent);">
+                  <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+                </div>
+                <div class="card-value" id="statAvg">—</div>
+                <div class="card-label">Avg Attendance %</div>
+              </div>
+            </div>
+
+          </div><!-- /stats row -->
+
+          <!-- Quick links row -->
+          <div class="row g-3 animate-fade-up" style="animation-delay:.25s;">
+            <div class="col-md-6">
+              <div class="glass-card p-4">
+                <h5 class="mb-3"><i class="bi bi-people me-2" style="color:var(--primary);" aria-hidden="true"></i>Students</h5>
+                <p class="text-muted-light mb-3" style="font-size:.9rem;">
+                  View and search the complete list of enrolled students with their attendance records.
+                </p>
+                <a href="students.html" class="btn-primary-custom" style="font-size:.88rem; padding:.6rem 1.5rem;">
+                  <i class="bi bi-arrow-right me-1"></i> View Students
+                </a>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="glass-card p-4">
+                <h5 class="mb-3"><i class="bi bi-bar-chart-line me-2" style="color:var(--secondary);" aria-hidden="true"></i>Analytics</h5>
+                <p class="text-muted-light mb-3" style="font-size:.9rem;">
+                  Explore attendance trends by branch, date, and individual student performance.
+                </p>
+                <a href="analytics.html" class="btn-outline-custom" style="font-size:.88rem; padding:.6rem 1.5rem;">
+                  <i class="bi bi-arrow-right me-1"></i> View Analytics
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /#dashContent -->
+
+      </div><!-- /.admin-content -->
+
+      <!-- Footer -->
+      <footer class="footer-custom" role="contentinfo" style="margin-top:0;">
+        <div class="container-fluid px-4">
+          <p>&copy; <span id="footerYear"></span> <span class="text-gradient fw-600">SmartAttend</span></p>
+        </div>
+      </footer>
+
+    </div><!-- /.admin-main -->
+  </div><!-- /.admin-layout -->
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Shared config (API_BASE) -->
+  <script src="config.js"></script>
+  <!-- API -->
+  <script src="js/api.js"></script>
+
+  <script>
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+    /* ── Topbar date ── */
+    document.getElementById('topbarDate').textContent =
+      new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+    /* ── Auth guard ── */
+    if (!localStorage.getItem('admin_token')) {
+      window.location.href = 'admin-login.html';
+    }
+
+    /* ── Sidebar toggle ── */
+    const sidebar  = document.getElementById('adminSidebar');
+    const overlay  = document.getElementById('sidebarOverlay');
+    const toggleBtn = document.getElementById('sidebarToggle');
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+    overlay.addEventListener('click', closeSidebar);
+
+    /* ── Toast helper ── */
+    function showToast(msg, type = 'info') {
+      const icons = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', info: 'bi-info-circle-fill' };
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast-custom ${type}`;
+      el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+      el.innerHTML = `
+        <i class="bi ${icons[type] || icons.info} toast-icon" aria-hidden="true"></i>
+        <span class="toast-msg">${msg}</span>
+        <button class="toast-close" aria-label="Close notification">&times;</button>
+      `;
+      el.querySelector('.toast-close').addEventListener('click', () => el.remove());
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4500);
+    }
+
+    /* ── Animate counter ── */
+    function animateCount(el, target, suffix = '') {
+      const duration = 800;
+      const start = performance.now();
+      const startVal = 0;
+      function step(now) {
+        const elapsed  = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased    = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(startVal + eased * (target - startVal)) + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    /* ── Load dashboard ── */
+    async function loadDashboard() {
+      document.getElementById('loadingState').style.display = 'flex';
+      document.getElementById('errorState').style.display   = 'none';
+      document.getElementById('dashContent').style.display  = 'none';
+
+      const result = await getAdminDashboard();
+
+      document.getElementById('loadingState').style.display = 'none';
+
+      if (!result.ok) {
+        document.getElementById('errorMsg').textContent = result.message || 'Failed to load dashboard.';
+        document.getElementById('errorState').style.display = 'flex';
+        showToast(result.message || 'Failed to load dashboard', 'error');
+        return;
+      }
+
+      document.getElementById('dashContent').style.display = 'block';
+      const d = result.data;
+
+      const totalStudents = d.totalStudents   ?? d.total_students   ?? 0;
+      const totalClasses  = d.totalClasses    ?? d.total_classes    ?? 0;
+      const todayAtt      = d.todayAttendance ?? d.today_attendance ?? 0;
+      const avgAtt        = parseFloat(d.averageAttendance ?? d.average_attendance ?? 0).toFixed(1);
+
+      animateCount(document.getElementById('statStudents'), totalStudents);
+      animateCount(document.getElementById('statClasses'),  totalClasses);
+      animateCount(document.getElementById('statToday'),    todayAtt);
+      document.getElementById('statAvg').textContent = avgAtt + '%';
+    }
+
+    /* ── Logout ── */
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      clearAdminSession();
+      showToast('Logged out successfully', 'info');
+      setTimeout(() => { window.location.href = 'admin-login.html'; }, 800);
+    });
+
+    /* ── Init ── */
+    loadDashboard();
+  </script>
+
+</body>
+</html>
