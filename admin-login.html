@@ -57,24 +57,24 @@
       <!-- Form -->
       <form id="adminLoginForm" novalidate aria-label="Admin login form">
 
-        <!-- Username -->
+        <!-- Email -->
         <div class="mb-3">
-          <label class="form-label-custom" for="adminUsername">Username</label>
+          <label class="form-label-custom" for="adminEmail">Email</label>
           <div class="form-floating-custom input-wrap">
-            <i class="bi bi-person-badge input-icon" aria-hidden="true"></i>
+            <i class="bi bi-envelope input-icon" aria-hidden="true"></i>
             <input
-              type="text"
-              id="adminUsername"
+              type="email"
+              id="adminEmail"
               class="form-control-custom"
-              placeholder="Enter admin username"
-              autocomplete="username"
+              placeholder="Enter admin email"
+              autocomplete="email"
               required
               aria-required="true"
-              aria-describedby="usernameError"
+              aria-describedby="emailError"
             />
           </div>
-          <div id="usernameError" class="invalid-feedback-custom" role="alert">
-            Username is required.
+          <div id="emailError" class="invalid-feedback-custom" role="alert">
+            Email is required.
           </div>
         </div>
 
@@ -189,11 +189,11 @@
 
     function validateForm() {
       let valid = true;
-      const username = document.getElementById('adminUsername').value.trim();
+      const email    = document.getElementById('adminEmail').value.trim();
       const password = document.getElementById('adminPassword').value;
 
-      setFieldError('adminUsername', 'usernameError', username.length === 0);
-      if (!username) valid = false;
+      setFieldError('adminEmail', 'emailError', email.length === 0);
+      if (!email) valid = false;
 
       setFieldError('adminPassword', 'passwordError', password.length === 0);
       if (!password) valid = false;
@@ -220,7 +220,7 @@
       loginSpinner.style.display = 'inline-flex';
 
       const payload = {
-        username: document.getElementById('adminUsername').value.trim(),
+        email:    document.getElementById('adminEmail').value.trim(),
         password: document.getElementById('adminPassword').value,
       };
 
@@ -243,9 +243,9 @@
     });
 
     /* ── Live validation on blur ── */
-    document.getElementById('adminUsername').addEventListener('blur', () => {
-      const val = document.getElementById('adminUsername').value.trim();
-      setFieldError('adminUsername', 'usernameError', val.length === 0);
+    document.getElementById('adminEmail').addEventListener('blur', () => {
+      const val = document.getElementById('adminEmail').value.trim();
+      setFieldError('adminEmail', 'emailError', val.length === 0);
     });
     document.getElementById('adminPassword').addEventListener('blur', () => {
       const val = document.getElementById('adminPassword').value;
