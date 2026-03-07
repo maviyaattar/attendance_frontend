@@ -68,7 +68,7 @@ function clearSession() {
 
 /**
  * Get the current device geo-coordinates.
- * @returns {Promise<{latitude: number, longitude: number}>}
+ * @returns {Promise<{latitude: number, longitude: number, accuracy: number}>}
  */
 function _getLocation() {
   return new Promise((resolve, reject) => {
@@ -77,12 +77,16 @@ function _getLocation() {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+      (pos) => resolve({
+        latitude:  pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        accuracy:  pos.coords.accuracy,
+      }),
       (err) => {
         let msg = 'Could not retrieve your location.';
-        if (err.code === err.PERMISSION_DENIED)  msg = 'Location permission denied. Please allow location access and try again.';
+        if (err.code === err.PERMISSION_DENIED)    msg = 'Location permission denied. Please allow location access and try again.';
         if (err.code === err.POSITION_UNAVAILABLE) msg = 'Location information is unavailable.';
-        if (err.code === err.TIMEOUT)            msg = 'Location request timed out.';
+        if (err.code === err.TIMEOUT)              msg = 'Location request timed out.';
         reject(new Error(msg));
       },
       { timeout: 10000, maximumAge: 0 }
@@ -186,8 +190,13 @@ async function markAttendance() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       student_id,
-      latitude: location.latitude,
+      latitude:  location.latitude,
       longitude: location.longitude,
+      accuracy:  location.accuracy,
+      device_info: {
+        userAgent: navigator.userAgent  || '',
+        platform:  (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '',
+      },
     }),
   });
 }
@@ -204,5 +213,77 @@ async function getDashboardData() {
   return _request(`/api/dashboard/${student_id}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
+  });
+}
+
+/* ── Admin API Functions ──────────────────────────────────────────── */
+
+/**
+ * Return JSON headers with admin Bearer token when present.
+ * @returns {Record<string, string>}
+ */
+function _adminHeaders() {
+  const token = localStorage.getItem('admin_token');
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  return headers;
+}
+
+/**
+ * Login as admin.
+ * @param {{ username: string, password: string }} payload
+ * @returns {Promise<{ok: boolean, data: any, message: string}>}
+ */
+async function adminLogin(payload) {
+  const result = await _request('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (result.ok && result.data.token) {
+    localStorage.setItem('admin_token', result.data.token);
+  }
+  return result;
+}
+
+/**
+ * Clear admin session data.
+ */
+function clearAdminSession() {
+  localStorage.removeItem('admin_token');
+}
+
+/**
+ * Fetch admin dashboard statistics.
+ * @returns {Promise<{ok: boolean, data: any, message: string}>}
+ */
+function getAdminDashboard() {
+  return _request('/api/admin/dashboard', {
+    method: 'GET',
+    headers: _adminHeaders(),
+  });
+}
+
+/**
+ * Fetch all students list for admin.
+ * @returns {Promise<{ok: boolean, data: any, message: string}>}
+ */
+function getAdminStudents() {
+  return _request('/api/admin/students', {
+    method: 'GET',
+    headers: _adminHeaders(),
+  });
+}
+
+/**
+ * Fetch attendance analytics data for admin.
+ * @returns {Promise<{ok: boolean, data: any, message: string}>}
+ */
+function getAdminAnalytics() {
+  return _request('/api/admin/analytics', {
+    method: 'GET',
+    headers: _adminHeaders(),
   });
 }

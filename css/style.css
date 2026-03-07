@@ -990,3 +990,379 @@ body {
   opacity: 0.4;
   display: block;
 }
+
+/* ================================================================
+   Admin Dashboard Layout
+   ================================================================ */
+
+/* ---------- Admin Body ---------- */
+.admin-body {
+  background: linear-gradient(135deg, #0f0e17 0%, #1a1a2e 50%, #16213e 100%);
+  min-height: 100vh;
+}
+
+/* ---------- Admin Layout Wrapper ---------- */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---------- Admin Sidebar ---------- */
+.admin-sidebar {
+  width: 260px;
+  background: rgba(15, 14, 23, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 200;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1.5rem;
+}
+
+.sidebar-brand {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.sidebar-brand i {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.4rem;
+}
+
+.sidebar-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted-light);
+  padding: 1.2rem 1.5rem 0.5rem;
+}
+
+.sidebar-nav {
+  list-style: none;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  flex: 1;
+}
+
+.sidebar-nav li a,
+.sidebar-nav li button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted-light);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: var(--transition);
+  background: none;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+.sidebar-nav li a:hover,
+.sidebar-nav li button:hover {
+  background: rgba(108, 99, 255, 0.15);
+  color: #fff;
+}
+
+.sidebar-nav li a.active {
+  background: rgba(108, 99, 255, 0.2);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.sidebar-nav li a i,
+.sidebar-nav li button i {
+  font-size: 1.05rem;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-logout {
+  padding: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: auto;
+}
+
+/* ---------- Admin Main Content ---------- */
+.admin-main {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-topbar {
+  background: rgba(15, 14, 23, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.admin-topbar .page-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  flex: 1;
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  transition: var(--transition);
+  display: none;
+}
+
+.sidebar-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.admin-content {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+/* ---------- Sidebar Overlay (mobile) ---------- */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 150;
+  backdrop-filter: blur(2px);
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+/* ---------- Admin Stat Cards ---------- */
+.admin-stat-card {
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-stat-card .card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+
+.admin-stat-card .card-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+  animation: countUp 0.8s ease;
+}
+
+.admin-stat-card .card-label {
+  color: var(--text-muted-light);
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- Admin Search Bar ---------- */
+.admin-search-wrap {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+
+.admin-search-input {
+  flex: 1;
+  min-width: 200px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  padding: 0.65rem 1rem 0.65rem 2.6rem;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: var(--transition);
+}
+
+.admin-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.admin-search-input:focus {
+  border-color: var(--primary);
+  background: rgba(108, 99, 255, 0.07);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+}
+
+.search-icon-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-icon-wrap i {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+.admin-select {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition);
+  min-width: 160px;
+}
+
+.admin-select option {
+  background: #1a1a2e;
+  color: #fff;
+}
+
+.admin-select:focus {
+  border-color: var(--primary);
+}
+
+/* ---------- Chart Container ---------- */
+.chart-card {
+  padding: 1.5rem;
+}
+
+.chart-card h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  color: var(--text-light);
+}
+
+.chart-wrap {
+  position: relative;
+  height: 280px;
+}
+
+/* ---------- Loading Overlay (full page) ---------- */
+.page-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  gap: 1rem;
+}
+
+/* ---------- Responsive Admin ---------- */
+@media (max-width: 900px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .admin-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+  }
+
+  .admin-main {
+    margin-left: 0;
+  }
+
+  .sidebar-toggle {
+    display: flex;
+  }
+}
+
+@media (max-width: 600px) {
+  .admin-content {
+    padding: 1rem;
+  }
+
+  .admin-stat-card .card-value {
+    font-size: 1.8rem;
+  }
+}
+
+/* ---------- Student Avatar (admin students table) ---------- */
+.student-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.student-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.branch-badge {
+  background: rgba(108, 99, 255, 0.15);
+  color: var(--primary);
+  padding: 0.25rem 0.65rem;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}

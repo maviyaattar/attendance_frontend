@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Attendance Analytics – Smart Location Based Attendance System." />
+  <title>Analytics – SmartAttend</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="admin-body">
+
+  <!-- Toast container -->
+  <div class="toast-container-custom" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <div class="admin-layout">
+
+    <!-- ── Sidebar ─────────────────────────────────────────────── -->
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
+      <a class="sidebar-brand" href="admin-dashboard.html" aria-label="SmartAttend Admin home">
+        <i class="bi bi-geo-alt-fill"></i>
+        SmartAttend
+      </a>
+
+      <div class="sidebar-label">Main Menu</div>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="admin-dashboard.html">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="students.html">
+            <i class="bi bi-people"></i> Students
+          </a>
+        </li>
+        <li>
+          <a href="analytics.html" class="active" aria-current="page">
+            <i class="bi bi-bar-chart-line"></i> Analytics
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-logout">
+        <button id="logoutBtn" class="btn-outline-custom w-100 justify-content-center"
+                style="font-size:.88rem; padding:.6rem 1rem;" aria-label="Logout">
+          <i class="bi bi-box-arrow-left me-1"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── Main Content ──────────────────────────────────────────── -->
+    <div class="admin-main">
+
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title">
+          <i class="bi bi-bar-chart-line me-2" style="color:var(--secondary);" aria-hidden="true"></i>
+          Attendance Analytics
+        </div>
+        <button class="btn-outline-custom" id="refreshBtn"
+                style="font-size:.8rem; padding:.4rem .9rem;" aria-label="Refresh analytics">
+          <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+        </button>
+      </header>
+
+      <!-- Content -->
+      <div class="admin-content">
+
+        <!-- Loading state -->
+        <div id="loadingState" class="page-loading" aria-live="polite" aria-label="Loading analytics">
+          <div class="spinner-custom" style="width:40px; height:40px; border-width:4px;" aria-hidden="true"></div>
+          <p class="text-muted-light">Loading analytics…</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="errorState" style="display:none;" class="page-loading" aria-live="polite">
+          <div class="glass-card p-4 text-center" style="max-width:400px;">
+            <i class="bi bi-exclamation-triangle-fill"
+               style="font-size:2.5rem; color:var(--danger); display:block; margin-bottom:1rem;"
+               aria-hidden="true"></i>
+            <p id="errorMsg" class="text-muted-light mb-3">Failed to load analytics data.</p>
+            <button class="btn-primary-custom" onclick="loadAnalytics()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Retry
+            </button>
+          </div>
+        </div>
+
+        <!-- Analytics content -->
+        <div id="analyticsContent" style="display:none;">
+
+          <!-- Row 1: Attendance by Branch + Attendance by Date -->
+          <div class="row g-3 mb-3">
+
+            <div class="col-lg-6">
+              <div class="glass-card chart-card animate-fade-up" style="animation-delay:.05s;">
+                <h5><i class="bi bi-diagram-3 me-2" style="color:var(--primary);" aria-hidden="true"></i>Attendance by Branch</h5>
+                <div class="chart-wrap" aria-label="Bar chart showing attendance by branch">
+                  <canvas id="branchChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="glass-card chart-card animate-fade-up" style="animation-delay:.1s;">
+                <h5><i class="bi bi-calendar-date me-2" style="color:var(--secondary);" aria-hidden="true"></i>Attendance by Date</h5>
+                <div class="chart-wrap" aria-label="Line chart showing attendance over time">
+                  <canvas id="dateChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /row 1 -->
+
+          <!-- Row 2: Low Attendance + Top Attendance -->
+          <div class="row g-3">
+
+            <div class="col-lg-6">
+              <div class="glass-card chart-card animate-fade-up" style="animation-delay:.15s;">
+                <h5><i class="bi bi-exclamation-triangle me-2" style="color:var(--danger);" aria-hidden="true"></i>Low Attendance Students</h5>
+                <div class="chart-wrap" aria-label="Bar chart showing students with low attendance">
+                  <canvas id="lowAttChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6">
+              <div class="glass-card chart-card animate-fade-up" style="animation-delay:.2s;">
+                <h5><i class="bi bi-trophy me-2" style="color:var(--warning);" aria-hidden="true"></i>Top Attendance Students</h5>
+                <div class="chart-wrap" aria-label="Bar chart showing students with top attendance">
+                  <canvas id="topAttChart"></canvas>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /row 2 -->
+
+        </div><!-- /#analyticsContent -->
+
+      </div><!-- /.admin-content -->
+
+      <!-- Footer -->
+      <footer class="footer-custom" role="contentinfo" style="margin-top:0;">
+        <div class="container-fluid px-4">
+          <p>&copy; <span id="footerYear"></span> <span class="text-gradient fw-600">SmartAttend</span></p>
+        </div>
+      </footer>
+
+    </div><!-- /.admin-main -->
+  </div><!-- /.admin-layout -->
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <!-- Shared config (API_BASE) -->
+  <script src="config.js"></script>
+  <!-- API -->
+  <script src="js/api.js"></script>
+
+  <script>
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+    /* ── Auth guard ── */
+    if (!localStorage.getItem('admin_token')) {
+      window.location.href = 'admin-login.html';
+    }
+
+    /* ── Sidebar toggle ── */
+    const sidebar   = document.getElementById('adminSidebar');
+    const overlay   = document.getElementById('sidebarOverlay');
+    const toggleBtn = document.getElementById('sidebarToggle');
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+    overlay.addEventListener('click', closeSidebar);
+
+    /* ── Toast helper ── */
+    function showToast(msg, type = 'info') {
+      const icons = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', info: 'bi-info-circle-fill' };
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast-custom ${type}`;
+      el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+      el.innerHTML = `
+        <i class="bi ${icons[type] || icons.info} toast-icon" aria-hidden="true"></i>
+        <span class="toast-msg">${msg}</span>
+        <button class="toast-close" aria-label="Close notification">&times;</button>
+      `;
+      el.querySelector('.toast-close').addEventListener('click', () => el.remove());
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4500);
+    }
+
+    /* ── Chart.js defaults ── */
+    Chart.defaults.color = 'rgba(255,255,255,0.6)';
+    Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
+    Chart.defaults.font.family = 'Inter, sans-serif';
+    Chart.defaults.font.size   = 12;
+
+    /* ── Chart instances (kept so we can destroy on refresh) ── */
+    const charts = {};
+
+    function destroyChart(id) {
+      if (charts[id]) {
+        charts[id].destroy();
+        charts[id] = null;
+      }
+    }
+
+    /* ── Shared chart options ── */
+    function baseBarOptions(horizontal = false) {
+      return {
+        indexAxis:  horizontal ? 'y' : 'x',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: (ctx) => ` ${ctx.parsed[horizontal ? 'x' : 'y']}%`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid:  { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: 'rgba(255,255,255,0.55)' },
+          },
+          y: {
+            grid:  { color: 'rgba(255,255,255,0.05)' },
+            ticks: { color: 'rgba(255,255,255,0.55)' },
+          },
+        },
+      };
+    }
+
+    /* ── Render charts ── */
+    function renderCharts(d) {
+
+      /* 1. Attendance by Branch */
+      const byBranch = d.byBranch ?? d.by_branch ?? d.attendanceByBranch ?? {};
+      if (typeof byBranch === 'object' && !Array.isArray(byBranch)) {
+        const labels = Object.keys(byBranch);
+        const values = labels.map((k) => parseFloat(byBranch[k]) || 0);
+        destroyChart('branch');
+        charts['branch'] = new Chart(document.getElementById('branchChart'), {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label: 'Avg Attendance %',
+              data: values,
+              backgroundColor: 'rgba(108,99,255,0.6)',
+              borderColor:     'rgba(108,99,255,1)',
+              borderWidth: 1,
+              borderRadius: 6,
+            }],
+          },
+          options: baseBarOptions(),
+        });
+      }
+
+      /* 2. Attendance by Date */
+      const byDate = d.byDate ?? d.by_date ?? d.attendanceByDate ?? [];
+      const dateArr = Array.isArray(byDate) ? byDate : Object.entries(byDate).map(([date, count]) => ({ date, count }));
+      if (dateArr.length > 0) {
+        const dateLabels = dateArr.map((e) =>
+          e.date ? new Date(e.date).toLocaleDateString(undefined, { day: '2-digit', month: 'short' }) : String(e.date)
+        );
+        const dateCounts = dateArr.map((e) => parseFloat(e.count ?? e.percentage ?? e.value ?? 0));
+        destroyChart('date');
+        charts['date'] = new Chart(document.getElementById('dateChart'), {
+          type: 'line',
+          data: {
+            labels: dateLabels,
+            datasets: [{
+              label: 'Attendance',
+              data: dateCounts,
+              borderColor:     'rgba(72,202,228,1)',
+              backgroundColor: 'rgba(72,202,228,0.15)',
+              borderWidth: 2,
+              pointBackgroundColor: 'rgba(72,202,228,1)',
+              fill: true,
+              tension: 0.4,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.55)' } },
+              y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: 'rgba(255,255,255,0.55)' } },
+            },
+          },
+        });
+      }
+
+      /* 3. Low Attendance Students */
+      const lowRaw  = d.lowAttendance   ?? d.low_attendance   ?? d.lowStudents   ?? [];
+      const lowArr  = Array.isArray(lowRaw) ? lowRaw : [];
+      if (lowArr.length > 0) {
+        destroyChart('low');
+        charts['low'] = new Chart(document.getElementById('lowAttChart'), {
+          type: 'bar',
+          data: {
+            labels: lowArr.map((s) => s.name ?? s.student_name ?? `Student ${s.id ?? ''}`),
+            datasets: [{
+              label: 'Attendance %',
+              data: lowArr.map((s) => parseFloat(s.attendancePercentage ?? s.attendance_percentage ?? s.percentage ?? 0)),
+              backgroundColor: 'rgba(239,35,60,0.55)',
+              borderColor:     'rgba(239,35,60,1)',
+              borderWidth: 1,
+              borderRadius: 5,
+            }],
+          },
+          options: {
+            ...baseBarOptions(true),
+            scales: {
+              x: {
+                max: 100,
+                grid:  { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: 'rgba(255,255,255,0.55)', callback: (v) => v + '%' },
+              },
+              y: {
+                grid:  { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: 'rgba(255,255,255,0.55)' },
+              },
+            },
+          },
+        });
+      }
+
+      /* 4. Top Attendance Students */
+      const topRaw  = d.topAttendance   ?? d.top_attendance   ?? d.topStudents   ?? [];
+      const topArr  = Array.isArray(topRaw) ? topRaw : [];
+      if (topArr.length > 0) {
+        destroyChart('top');
+        charts['top'] = new Chart(document.getElementById('topAttChart'), {
+          type: 'bar',
+          data: {
+            labels: topArr.map((s) => s.name ?? s.student_name ?? `Student ${s.id ?? ''}`),
+            datasets: [{
+              label: 'Attendance %',
+              data: topArr.map((s) => parseFloat(s.attendancePercentage ?? s.attendance_percentage ?? s.percentage ?? 0)),
+              backgroundColor: 'rgba(6,214,160,0.55)',
+              borderColor:     'rgba(6,214,160,1)',
+              borderWidth: 1,
+              borderRadius: 5,
+            }],
+          },
+          options: {
+            ...baseBarOptions(true),
+            scales: {
+              x: {
+                max: 100,
+                grid:  { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: 'rgba(255,255,255,0.55)', callback: (v) => v + '%' },
+              },
+              y: {
+                grid:  { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: 'rgba(255,255,255,0.55)' },
+              },
+            },
+          },
+        });
+      }
+    }
+
+    /* ── Load analytics ── */
+    async function loadAnalytics() {
+      document.getElementById('loadingState').style.display     = 'flex';
+      document.getElementById('errorState').style.display       = 'none';
+      document.getElementById('analyticsContent').style.display = 'none';
+
+      const result = await getAdminAnalytics();
+
+      document.getElementById('loadingState').style.display = 'none';
+
+      if (!result.ok) {
+        document.getElementById('errorMsg').textContent = result.message || 'Failed to load analytics.';
+        document.getElementById('errorState').style.display = 'flex';
+        showToast(result.message || 'Failed to load analytics', 'error');
+        return;
+      }
+
+      document.getElementById('analyticsContent').style.display = 'block';
+      renderCharts(result.data || {});
+    }
+
+    /* ── Refresh button ── */
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      showToast('Refreshing analytics…', 'info');
+      loadAnalytics();
+    });
+
+    /* ── Logout ── */
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      clearAdminSession();
+      showToast('Logged out successfully', 'info');
+      setTimeout(() => { window.location.href = 'admin-login.html'; }, 800);
+    });
+
+    /* ── Init ── */
+    loadAnalytics();
+  </script>
+
+</body>
+</html>
