@@ -26,7 +26,7 @@
         SmartAttend
       </a>
       <div class="ms-auto d-flex align-items-center gap-2">
-        <a class="nav-link-custom" href="login.html">Login</a>
+        <a class="nav-link-custom active" href="login.html">Login</a>
         <a class="btn-primary-custom" href="register.html">Register</a>
       </div>
     </div>
@@ -38,89 +38,190 @@
 
       <!-- Header -->
       <div class="text-center mb-4">
-        <i class="bi bi-person-circle auth-logo text-gradient" aria-hidden="true"></i>
-        <h1 class="auth-title">Welcome Back</h1>
-        <p class="auth-subtitle">Sign in to access your attendance dashboard</p>
+        <i class="bi bi-person-circle auth-logo text-gradient" id="loginLogo" aria-hidden="true"></i>
+        <h1 class="auth-title" id="loginTitle">Welcome Back</h1>
+        <p class="auth-subtitle" id="loginSubtitle">Sign in to access your attendance dashboard</p>
       </div>
 
-      <!-- Error Alert -->
-      <div id="loginAlert" class="alert-custom error" role="alert" style="display:none;">
-        <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
-        <span id="loginAlertMsg">Invalid credentials. Please try again.</span>
-      </div>
-
-      <!-- Success Alert -->
-      <div id="loginSuccess" class="alert-custom success" role="status" style="display:none;">
-        <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
-        <span>Login successful! Redirecting…</span>
-      </div>
-
-      <!-- Form -->
-      <form id="loginForm" novalidate aria-label="Login form">
-
-        <!-- Email -->
-        <div class="mb-3">
-          <label class="form-label-custom" for="loginEmail">Email Address</label>
-          <div class="form-floating-custom input-wrap">
-            <i class="bi bi-envelope input-icon" aria-hidden="true"></i>
-            <input
-              type="email"
-              id="loginEmail"
-              class="form-control-custom"
-              placeholder="you@college.edu"
-              autocomplete="email"
-              required
-              aria-required="true"
-              aria-describedby="loginEmailError"
-            />
-          </div>
-          <div id="loginEmailError" class="invalid-feedback-custom" role="alert">
-            Please enter a valid email address.
-          </div>
-        </div>
-
-        <!-- Password -->
-        <div class="mb-4">
-          <label class="form-label-custom" for="loginPassword">Password</label>
-          <div class="form-floating-custom password-wrap">
-            <i class="bi bi-lock input-icon" aria-hidden="true"></i>
-            <input
-              type="password"
-              id="loginPassword"
-              class="form-control-custom"
-              placeholder="Enter your password"
-              autocomplete="current-password"
-              required
-              aria-required="true"
-              aria-describedby="loginPasswordError"
-            />
-            <button type="button" class="password-toggle" id="toggleLoginPwd"
-                    aria-label="Toggle password visibility">
-              <i class="bi bi-eye" id="toggleLoginPwdIcon"></i>
-            </button>
-          </div>
-          <div id="loginPasswordError" class="invalid-feedback-custom" role="alert">
-            Password is required.
-          </div>
-        </div>
-
-        <!-- Submit -->
-        <button type="submit" class="btn-primary-custom w-100 justify-content-center" id="loginBtn">
-          <span id="loginBtnText"><i class="bi bi-box-arrow-in-right me-1"></i>Sign In</span>
-          <span id="loginSpinner" style="display:none;">
-            <span class="spinner-custom me-1" aria-hidden="true"></span> Signing in…
-          </span>
+      <!-- Role Tab Switcher -->
+      <div class="role-tabs" role="tablist" aria-label="Login role selection">
+        <button class="role-tab active" id="tabStudent" role="tab" aria-selected="true"
+                aria-controls="studentPanel" data-role="student">
+          <i class="bi bi-person-fill me-1" aria-hidden="true"></i> Student Login
         </button>
-
-      </form>
-
-      <div class="auth-divider">
-        <span>New here?</span>
+        <button class="role-tab" id="tabAdmin" role="tab" aria-selected="false"
+                aria-controls="adminPanel" data-role="admin">
+          <i class="bi bi-shield-fill me-1" aria-hidden="true"></i> Admin Login
+        </button>
       </div>
 
-      <a href="register.html" class="btn-outline-custom w-100 justify-content-center">
-        <i class="bi bi-person-plus me-1"></i> Create Student Account
-      </a>
+      <!-- ── Student Login Panel ── -->
+      <div id="studentPanel" role="tabpanel" aria-labelledby="tabStudent">
+
+        <!-- Error Alert -->
+        <div id="loginAlert" class="alert-custom error" role="alert" style="display:none;">
+          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+          <span id="loginAlertMsg">Invalid credentials. Please try again.</span>
+        </div>
+
+        <!-- Success Alert -->
+        <div id="loginSuccess" class="alert-custom success" role="status" style="display:none;">
+          <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+          <span>Login successful! Redirecting…</span>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm" novalidate aria-label="Student login form">
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label class="form-label-custom" for="loginEmail">Email Address</label>
+            <div class="form-floating-custom input-wrap">
+              <i class="bi bi-envelope input-icon" aria-hidden="true"></i>
+              <input
+                type="email"
+                id="loginEmail"
+                class="form-control-custom"
+                placeholder="you@college.edu"
+                autocomplete="email"
+                required
+                aria-required="true"
+                aria-describedby="loginEmailError"
+              />
+            </div>
+            <div id="loginEmailError" class="invalid-feedback-custom" role="alert">
+              Please enter a valid email address.
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-4">
+            <label class="form-label-custom" for="loginPassword">Password</label>
+            <div class="form-floating-custom password-wrap">
+              <i class="bi bi-lock input-icon" aria-hidden="true"></i>
+              <input
+                type="password"
+                id="loginPassword"
+                class="form-control-custom"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+                aria-required="true"
+                aria-describedby="loginPasswordError"
+              />
+              <button type="button" class="password-toggle" id="toggleLoginPwd"
+                      aria-label="Toggle password visibility">
+                <i class="bi bi-eye" id="toggleLoginPwdIcon"></i>
+              </button>
+            </div>
+            <div id="loginPasswordError" class="invalid-feedback-custom" role="alert">
+              Password is required.
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-primary-custom w-100 justify-content-center" id="loginBtn">
+            <span id="loginBtnText"><i class="bi bi-box-arrow-in-right me-1"></i>Sign In</span>
+            <span id="loginSpinner" style="display:none;">
+              <span class="spinner-custom me-1" aria-hidden="true"></span> Signing in…
+            </span>
+          </button>
+
+        </form>
+
+        <div class="auth-divider">
+          <span>New here?</span>
+        </div>
+
+        <a href="register.html" class="btn-outline-custom w-100 justify-content-center">
+          <i class="bi bi-person-plus me-1"></i> Create Student Account
+        </a>
+
+      </div><!-- /#studentPanel -->
+
+      <!-- ── Admin Login Panel ── -->
+      <div id="adminPanel" role="tabpanel" aria-labelledby="tabAdmin" style="display:none;">
+
+        <!-- Error Alert -->
+        <div id="adminLoginAlert" class="alert-custom error" role="alert" style="display:none;">
+          <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+          <span id="adminLoginAlertMsg">Invalid credentials. Please try again.</span>
+        </div>
+
+        <!-- Success Alert -->
+        <div id="adminLoginSuccess" class="alert-custom success" role="status" style="display:none;">
+          <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+          <span>Login successful! Redirecting…</span>
+        </div>
+
+        <!-- Form -->
+        <form id="adminLoginForm" novalidate aria-label="Admin login form">
+
+          <!-- Username -->
+          <div class="mb-3">
+            <label class="form-label-custom" for="adminUsername">Username</label>
+            <div class="form-floating-custom input-wrap">
+              <i class="bi bi-person-badge input-icon" aria-hidden="true"></i>
+              <input
+                type="text"
+                id="adminUsername"
+                class="form-control-custom"
+                placeholder="Enter admin username"
+                autocomplete="username"
+                required
+                aria-required="true"
+                aria-describedby="adminUsernameError"
+              />
+            </div>
+            <div id="adminUsernameError" class="invalid-feedback-custom" role="alert">
+              Username is required.
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-4">
+            <label class="form-label-custom" for="adminPassword">Password</label>
+            <div class="form-floating-custom password-wrap">
+              <i class="bi bi-lock input-icon" aria-hidden="true"></i>
+              <input
+                type="password"
+                id="adminPassword"
+                class="form-control-custom"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+                aria-required="true"
+                aria-describedby="adminPasswordError"
+              />
+              <button type="button" class="password-toggle" id="toggleAdminPwd"
+                      aria-label="Toggle password visibility">
+                <i class="bi bi-eye" id="toggleAdminPwdIcon"></i>
+              </button>
+            </div>
+            <div id="adminPasswordError" class="invalid-feedback-custom" role="alert">
+              Password is required.
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-primary-custom w-100 justify-content-center" id="adminLoginBtn">
+            <span id="adminLoginBtnText"><i class="bi bi-shield-lock me-1"></i>Sign In as Admin</span>
+            <span id="adminLoginSpinner" style="display:none;">
+              <span class="spinner-custom me-1" aria-hidden="true"></span> Signing in…
+            </span>
+          </button>
+
+        </form>
+
+        <div class="auth-divider">
+          <span>Not an admin?</span>
+        </div>
+
+        <a href="admin-login.html" class="btn-outline-custom w-100 justify-content-center">
+          <i class="bi bi-shield-lock me-1"></i> Go to Dedicated Admin Login
+        </a>
+
+      </div><!-- /#adminPanel -->
 
     </div>
   </main>
@@ -142,15 +243,68 @@
   <script>
     document.getElementById('footerYear').textContent = new Date().getFullYear();
 
-    /* ── Password toggle ── */
-    const toggleBtn  = document.getElementById('toggleLoginPwd');
-    const pwdInput   = document.getElementById('loginPassword');
-    const toggleIcon = document.getElementById('toggleLoginPwdIcon');
+    /* ── Redirect if already logged in ── */
+    (function () {
+      const role = localStorage.getItem('role');
+      if (role === 'student' && localStorage.getItem('student_id')) {
+        window.location.href = 'student-dashboard.html';
+      } else if (role === 'admin' && localStorage.getItem('admin_token')) {
+        window.location.href = 'admin-dashboard.html';
+      }
+    })();
 
-    toggleBtn.addEventListener('click', () => {
-      const isText = pwdInput.type === 'text';
-      pwdInput.type = isText ? 'password' : 'text';
-      toggleIcon.className = isText ? 'bi bi-eye' : 'bi bi-eye-slash';
+    /* ── Role Tab Switching ── */
+    const tabStudent  = document.getElementById('tabStudent');
+    const tabAdmin    = document.getElementById('tabAdmin');
+    const studentPanel = document.getElementById('studentPanel');
+    const adminPanel   = document.getElementById('adminPanel');
+    const loginLogo   = document.getElementById('loginLogo');
+    const loginTitle  = document.getElementById('loginTitle');
+    const loginSubtitle = document.getElementById('loginSubtitle');
+
+    function switchTab(role) {
+      if (role === 'student') {
+        tabStudent.classList.add('active');
+        tabStudent.setAttribute('aria-selected', 'true');
+        tabAdmin.classList.remove('active');
+        tabAdmin.setAttribute('aria-selected', 'false');
+        studentPanel.style.display = 'block';
+        adminPanel.style.display   = 'none';
+        loginLogo.className = 'bi bi-person-circle auth-logo text-gradient';
+        loginTitle.textContent   = 'Welcome Back';
+        loginSubtitle.textContent = 'Sign in to access your attendance dashboard';
+      } else {
+        tabAdmin.classList.add('active');
+        tabAdmin.setAttribute('aria-selected', 'true');
+        tabStudent.classList.remove('active');
+        tabStudent.setAttribute('aria-selected', 'false');
+        adminPanel.style.display   = 'block';
+        studentPanel.style.display = 'none';
+        loginLogo.className = 'bi bi-shield-lock auth-logo text-gradient';
+        loginTitle.textContent    = 'Admin Portal';
+        loginSubtitle.textContent = 'Sign in to access the teacher / admin dashboard';
+      }
+    }
+
+    tabStudent.addEventListener('click', () => switchTab('student'));
+    tabAdmin.addEventListener('click',   () => switchTab('admin'));
+
+    /* ── Student Password toggle ── */
+    document.getElementById('toggleLoginPwd').addEventListener('click', () => {
+      const pwd  = document.getElementById('loginPassword');
+      const icon = document.getElementById('toggleLoginPwdIcon');
+      const isText = pwd.type === 'text';
+      pwd.type = isText ? 'password' : 'text';
+      icon.className = isText ? 'bi bi-eye' : 'bi bi-eye-slash';
+    });
+
+    /* ── Admin Password toggle ── */
+    document.getElementById('toggleAdminPwd').addEventListener('click', () => {
+      const pwd  = document.getElementById('adminPassword');
+      const icon = document.getElementById('toggleAdminPwdIcon');
+      const isText = pwd.type === 'text';
+      pwd.type = isText ? 'password' : 'text';
+      icon.className = isText ? 'bi bi-eye' : 'bi bi-eye-slash';
     });
 
     /* ── Toast helper ── */
@@ -187,7 +341,8 @@
       }
     }
 
-    function validateForm() {
+    /* ── Student form validation ── */
+    function validateStudentForm() {
       let valid = true;
       const email    = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
@@ -202,11 +357,25 @@
       return valid;
     }
 
-    /* ── Form submit ── */
+    /* ── Admin form validation ── */
+    function validateAdminForm() {
+      let valid = true;
+      const username = document.getElementById('adminUsername').value.trim();
+      const password = document.getElementById('adminPassword').value;
+
+      setError('adminUsername', 'adminUsernameError', username.length === 0);
+      if (!username) valid = false;
+
+      setError('adminPassword', 'adminPasswordError', password.length === 0);
+      if (!password) valid = false;
+
+      return valid;
+    }
+
+    /* ── Student form submit ── */
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      if (!validateForm()) return;
+      if (!validateStudentForm()) return;
 
       const loginAlert   = document.getElementById('loginAlert');
       const loginSuccess = document.getElementById('loginSuccess');
@@ -214,12 +383,10 @@
       const loginBtnText = document.getElementById('loginBtnText');
       const loginSpinner = document.getElementById('loginSpinner');
 
-      // Reset state
       loginAlert.style.display   = 'none';
       loginSuccess.style.display = 'none';
 
-      // Loading state
-      loginBtn.disabled        = true;
+      loginBtn.disabled          = true;
       loginBtnText.style.display = 'none';
       loginSpinner.style.display = 'inline-flex';
 
@@ -230,14 +397,14 @@
 
       const result = await loginUser(payload);
 
-      loginBtn.disabled        = false;
+      loginBtn.disabled          = false;
       loginBtnText.style.display = 'inline-flex';
       loginSpinner.style.display = 'none';
 
       if (result.ok) {
         loginSuccess.style.display = 'flex';
         showToast('Login successful! Redirecting…', 'success');
-        setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+        setTimeout(() => { window.location.href = 'student-dashboard.html'; }, 1200);
       } else {
         loginAlert.style.display = 'flex';
         document.getElementById('loginAlertMsg').textContent =
@@ -246,7 +413,48 @@
       }
     });
 
-    /* ── Live validation on blur ── */
+    /* ── Admin form submit ── */
+    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validateAdminForm()) return;
+
+      const alert   = document.getElementById('adminLoginAlert');
+      const success = document.getElementById('adminLoginSuccess');
+      const btn     = document.getElementById('adminLoginBtn');
+      const btnText = document.getElementById('adminLoginBtnText');
+      const spinner = document.getElementById('adminLoginSpinner');
+
+      alert.style.display   = 'none';
+      success.style.display = 'none';
+
+      btn.disabled        = true;
+      btnText.style.display = 'none';
+      spinner.style.display = 'inline-flex';
+
+      const payload = {
+        username: document.getElementById('adminUsername').value.trim(),
+        password: document.getElementById('adminPassword').value,
+      };
+
+      const result = await adminLogin(payload);
+
+      btn.disabled        = false;
+      btnText.style.display = 'inline-flex';
+      spinner.style.display = 'none';
+
+      if (result.ok) {
+        success.style.display = 'flex';
+        showToast('Login successful! Redirecting…', 'success');
+        setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1200);
+      } else {
+        alert.style.display = 'flex';
+        document.getElementById('adminLoginAlertMsg').textContent =
+          result.message || 'Invalid credentials. Please try again.';
+        showToast(result.message || 'Login failed', 'error');
+      }
+    });
+
+    /* ── Live validation on blur (student) ── */
     document.getElementById('loginEmail').addEventListener('blur', () => {
       const val = document.getElementById('loginEmail').value.trim();
       if (val) setError('loginEmail', 'loginEmailError', !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val));
@@ -254,6 +462,16 @@
     document.getElementById('loginPassword').addEventListener('blur', () => {
       if (document.getElementById('loginPassword').value)
         setError('loginPassword', 'loginPasswordError', false);
+    });
+
+    /* ── Live validation on blur (admin) ── */
+    document.getElementById('adminUsername').addEventListener('blur', () => {
+      const val = document.getElementById('adminUsername').value.trim();
+      setError('adminUsername', 'adminUsernameError', val.length === 0);
+    });
+    document.getElementById('adminPassword').addEventListener('blur', () => {
+      const val = document.getElementById('adminPassword').value;
+      setError('adminPassword', 'adminPasswordError', val.length === 0);
     });
   </script>
 

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Manage Classes – Smart Location Based Attendance System." />
+  <title>Manage Classes – SmartAttend</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="admin-body">
+
+  <!-- Toast container -->
+  <div class="toast-container-custom" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <div class="admin-layout">
+
+    <!-- ── Sidebar ─────────────────────────────────────────────── -->
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
+      <a class="sidebar-brand" href="admin-dashboard.html" aria-label="SmartAttend Admin home">
+        <i class="bi bi-geo-alt-fill"></i>
+        SmartAttend
+      </a>
+
+      <div class="sidebar-label">Main Menu</div>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="admin-dashboard.html">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="manage-classes.html" class="active" aria-current="page">
+            <i class="bi bi-journal-bookmark"></i> Classes
+          </a>
+        </li>
+        <li>
+          <a href="students-list.html">
+            <i class="bi bi-people"></i> Students
+          </a>
+        </li>
+        <li>
+          <a href="attendance-report.html">
+            <i class="bi bi-clipboard-data"></i> Attendance Report
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-logout">
+        <button id="logoutBtn" class="btn-outline-custom w-100 justify-content-center"
+                style="font-size:.88rem; padding:.6rem 1rem;" aria-label="Logout">
+          <i class="bi bi-box-arrow-left me-1"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── Main Content ──────────────────────────────────────────── -->
+    <div class="admin-main">
+
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title">
+          <i class="bi bi-journal-bookmark me-2" style="color:var(--primary);" aria-hidden="true"></i>
+          Manage Classes
+        </div>
+        <span style="font-size:.82rem; color:var(--text-muted-light);" id="topbarDate"></span>
+      </header>
+
+      <!-- Content -->
+      <div class="admin-content">
+
+        <!-- Create Class Form -->
+        <div class="glass-card p-4 mb-4 animate-fade-down">
+          <h5 class="mb-3">
+            <i class="bi bi-plus-circle me-2" style="color:var(--primary);" aria-hidden="true"></i>
+            Create New Class
+          </h5>
+
+          <!-- Form alert -->
+          <div id="formAlert" class="alert-custom error" role="alert" style="display:none;">
+            <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+            <span id="formAlertMsg">Please fill in all required fields.</span>
+          </div>
+          <div id="formSuccess" class="alert-custom success" role="status" style="display:none;">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i>
+            <span>Class created successfully!</span>
+          </div>
+
+          <form id="createClassForm" novalidate aria-label="Create class form">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label-custom" for="className">Class Name <span style="color:var(--accent)">*</span></label>
+                <div class="form-floating-custom input-wrap">
+                  <i class="bi bi-journals input-icon" aria-hidden="true"></i>
+                  <input type="text" id="className" class="form-control-custom"
+                         placeholder="e.g. Semester 3 – Section A"
+                         required aria-required="true" />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-custom" for="classSubject">Subject <span style="color:var(--accent)">*</span></label>
+                <div class="form-floating-custom input-wrap">
+                  <i class="bi bi-book input-icon" aria-hidden="true"></i>
+                  <input type="text" id="classSubject" class="form-control-custom"
+                         placeholder="e.g. Data Structures"
+                         required aria-required="true" />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-custom" for="teacherName">Teacher Name <span style="color:var(--accent)">*</span></label>
+                <div class="form-floating-custom input-wrap">
+                  <i class="bi bi-person-workspace input-icon" aria-hidden="true"></i>
+                  <input type="text" id="teacherName" class="form-control-custom"
+                         placeholder="e.g. Prof. Sharma"
+                         required aria-required="true" />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-custom" for="scheduleTime">Schedule Time <span style="color:var(--accent)">*</span></label>
+                <div class="form-floating-custom input-wrap">
+                  <i class="bi bi-clock input-icon" aria-hidden="true"></i>
+                  <input type="text" id="scheduleTime" class="form-control-custom"
+                         placeholder="e.g. Mon/Wed/Fri 10:00–11:00 AM"
+                         required aria-required="true" />
+                </div>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn-primary-custom" id="createClassBtn">
+                  <span id="createBtnText"><i class="bi bi-plus-lg me-1"></i> Create Class</span>
+                  <span id="createSpinner" style="display:none;">
+                    <span class="spinner-custom me-1" aria-hidden="true"></span> Creating…
+                  </span>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Classes List -->
+        <div class="glass-card animate-fade-up" style="animation-delay:.1s;">
+
+          <!-- List header -->
+          <div class="p-3 pb-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="section-header mb-0">
+              <h5 class="section-title mb-0">
+                <i class="bi bi-list-ul me-2" aria-hidden="true"></i>All Classes
+              </h5>
+              <p class="section-sub mb-0" id="classCount"></p>
+            </div>
+            <button class="btn-outline-custom" id="refreshClassesBtn"
+                    style="font-size:.82rem; padding:.35rem .9rem;" aria-label="Refresh classes list">
+              <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+            </button>
+          </div>
+
+          <!-- Loading / Error states -->
+          <div id="classesLoading" class="page-loading py-4" aria-live="polite">
+            <div class="spinner-custom" style="width:32px; height:32px; border-width:3px;" aria-hidden="true"></div>
+            <p class="text-muted-light">Loading classes…</p>
+          </div>
+
+          <div id="classesError" style="display:none;" class="page-loading py-4" aria-live="polite">
+            <div class="glass-card p-3 text-center" style="max-width:360px;">
+              <i class="bi bi-exclamation-triangle-fill"
+                 style="font-size:2rem; color:var(--danger); display:block; margin-bottom:.75rem;"
+                 aria-hidden="true"></i>
+              <p id="classesErrorMsg" class="text-muted-light mb-2">Failed to load classes.</p>
+              <button class="btn-primary-custom" onclick="loadClasses()" style="font-size:.85rem; padding:.5rem 1.2rem;">
+                <i class="bi bi-arrow-clockwise me-1"></i> Retry
+              </button>
+            </div>
+          </div>
+
+          <div id="classesList" style="display:none;" aria-label="Classes list">
+            <!-- Cards injected by JS -->
+          </div>
+
+          <div id="noClasses" class="no-records" style="display:none;" aria-live="polite">
+            <i class="bi bi-journal-x" aria-hidden="true"></i>
+            No classes found. Create your first class above.
+          </div>
+
+        </div><!-- /classes card -->
+
+      </div><!-- /.admin-content -->
+
+      <!-- Footer -->
+      <footer class="footer-custom" role="contentinfo" style="margin-top:0;">
+        <div class="container-fluid px-4">
+          <p>&copy; <span id="footerYear"></span> <span class="text-gradient fw-600">SmartAttend</span></p>
+        </div>
+      </footer>
+
+    </div><!-- /.admin-main -->
+  </div><!-- /.admin-layout -->
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Shared config (API_BASE) -->
+  <script src="config.js"></script>
+  <!-- API -->
+  <script src="js/api.js"></script>
+
+  <script>
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+    document.getElementById('topbarDate').textContent =
+      new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+    /* ── Auth guard ── */
+    if (!localStorage.getItem('admin_token') || localStorage.getItem('role') !== 'admin') {
+      window.location.href = 'admin-login.html';
+    }
+
+    /* ── Sidebar toggle ── */
+    const sidebar   = document.getElementById('adminSidebar');
+    const overlay   = document.getElementById('sidebarOverlay');
+    const toggleBtn = document.getElementById('sidebarToggle');
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+    overlay.addEventListener('click', closeSidebar);
+
+    /* ── Toast helper ── */
+    function showToast(msg, type = 'info') {
+      const icons = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', info: 'bi-info-circle-fill' };
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast-custom ${type}`;
+      el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+      el.innerHTML = `
+        <i class="bi ${icons[type] || icons.info} toast-icon" aria-hidden="true"></i>
+        <span class="toast-msg">${msg}</span>
+        <button class="toast-close" aria-label="Close notification">&times;</button>
+      `;
+      el.querySelector('.toast-close').addEventListener('click', () => el.remove());
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4500);
+    }
+
+    /* ── Render classes list ── */
+    function renderClasses(classes) {
+      const list    = document.getElementById('classesList');
+      const noEl    = document.getElementById('noClasses');
+      const countEl = document.getElementById('classCount');
+      list.innerHTML = '';
+
+      countEl.textContent = `${classes.length} class${classes.length !== 1 ? 'es' : ''} total`;
+
+      if (classes.length === 0) {
+        noEl.style.display  = 'block';
+        list.style.display  = 'none';
+        return;
+      }
+      noEl.style.display  = 'none';
+      list.style.display  = 'block';
+
+      classes.forEach((cls) => {
+        const name     = cls.class_name  ?? cls.className  ?? cls.name     ?? '—';
+        const subject  = cls.subject     ?? '—';
+        const teacher  = cls.teacher_name ?? cls.teacherName ?? cls.teacher  ?? '—';
+        const schedule = cls.schedule_time ?? cls.scheduleTime ?? cls.schedule ?? '—';
+
+        const div = document.createElement('div');
+        div.className = 'class-card';
+        div.innerHTML = `
+          <div class="class-card-title">
+            <i class="bi bi-journal-bookmark me-2" style="color:var(--primary);" aria-hidden="true"></i>
+            ${name}
+          </div>
+          <div class="class-card-meta">
+            <span><i class="bi bi-book" aria-hidden="true"></i> ${subject}</span>
+            <span><i class="bi bi-person-workspace" aria-hidden="true"></i> ${teacher}</span>
+            <span><i class="bi bi-clock" aria-hidden="true"></i> ${schedule}</span>
+          </div>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    /* ── Load classes ── */
+    async function loadClasses() {
+      document.getElementById('classesLoading').style.display = 'flex';
+      document.getElementById('classesError').style.display   = 'none';
+      document.getElementById('classesList').style.display    = 'none';
+      document.getElementById('noClasses').style.display      = 'none';
+
+      const result = await getAdminClasses();
+
+      document.getElementById('classesLoading').style.display = 'none';
+
+      if (!result.ok) {
+        document.getElementById('classesErrorMsg').textContent = result.message || 'Failed to load classes.';
+        document.getElementById('classesError').style.display = 'flex';
+        showToast(result.message || 'Failed to load classes', 'error');
+        return;
+      }
+
+      const data = result.data;
+      const classes = Array.isArray(data) ? data : (data.classes ?? data.data ?? []);
+      renderClasses(classes);
+    }
+
+    /* ── Create class form submit ── */
+    document.getElementById('createClassForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formAlert   = document.getElementById('formAlert');
+      const formSuccess = document.getElementById('formSuccess');
+      const btn         = document.getElementById('createClassBtn');
+      const btnText     = document.getElementById('createBtnText');
+      const spinner     = document.getElementById('createSpinner');
+
+      const className   = document.getElementById('className').value.trim();
+      const subject     = document.getElementById('classSubject').value.trim();
+      const teacherName = document.getElementById('teacherName').value.trim();
+      const scheduleTime = document.getElementById('scheduleTime').value.trim();
+
+      if (!className || !subject || !teacherName || !scheduleTime) {
+        formAlert.style.display = 'flex';
+        document.getElementById('formAlertMsg').textContent = 'Please fill in all required fields.';
+        formSuccess.style.display = 'none';
+        return;
+      }
+
+      formAlert.style.display   = 'none';
+      formSuccess.style.display = 'none';
+      btn.disabled              = true;
+      btnText.style.display     = 'none';
+      spinner.style.display     = 'inline-flex';
+
+      const result = await createClass({ class_name: className, subject, teacher_name: teacherName, schedule_time: scheduleTime });
+
+      btn.disabled          = false;
+      btnText.style.display = 'inline-flex';
+      spinner.style.display = 'none';
+
+      if (result.ok) {
+        formSuccess.style.display = 'flex';
+        showToast('Class created successfully!', 'success');
+        document.getElementById('createClassForm').reset();
+        loadClasses();
+      } else {
+        formAlert.style.display = 'flex';
+        document.getElementById('formAlertMsg').textContent =
+          result.message || 'Failed to create class.';
+        showToast(result.message || 'Failed to create class', 'error');
+      }
+    });
+
+    /* ── Refresh button ── */
+    document.getElementById('refreshClassesBtn').addEventListener('click', () => {
+      showToast('Refreshing classes…', 'info');
+      loadClasses();
+    });
+
+    /* ── Logout ── */
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      clearAdminSession();
+      showToast('Logged out successfully', 'info');
+      setTimeout(() => { window.location.href = 'admin-login.html'; }, 800);
+    });
+
+    /* ── Init ── */
+    loadClasses();
+  </script>
+
+</body>
+</html>

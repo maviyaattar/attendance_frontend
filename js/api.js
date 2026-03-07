@@ -5,8 +5,15 @@
  * Endpoints:
  *   POST /api/register
  *   POST /api/login
+ *   POST /api/admin/login
  *   POST /api/mark-attendance
  *   GET  /api/dashboard/{student_id}
+ *   GET  /api/admin/today-attendance
+ *   GET  /api/admin/students
+ *   GET  /api/admin/attendance
+ *   GET  /api/admin/export
+ *   GET  /api/classes
+ *   POST /api/classes/create
  */
 
 // API_BASE is declared in config.js and loaded before this script.
@@ -42,6 +49,7 @@ function _saveSession(data) {
   if (sid != null) {
     localStorage.setItem('student_id', String(sid));
   }
+  localStorage.setItem('role', 'student');
 }
 
 /**
@@ -64,6 +72,7 @@ function clearSession() {
   localStorage.removeItem('attendance_token');
   localStorage.removeItem('attendance_student');
   localStorage.removeItem('student_id');
+  localStorage.removeItem('role');
 }
 
 /**
@@ -166,7 +175,6 @@ async function loginUser(payload) {
 
   return result;
 }
-
 /**
  * Mark attendance for the logged-in student.
  * Automatically captures device location before sending.
@@ -242,8 +250,11 @@ async function adminLogin(payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   });
-  if (result.ok && result.data.token) {
-    localStorage.setItem('admin_token', result.data.token);
+  if (result.ok) {
+    if (result.data.token) {
+      localStorage.setItem('admin_token', result.data.token);
+    }
+    localStorage.setItem('role', 'admin');
   }
   return result;
 }
@@ -253,6 +264,7 @@ async function adminLogin(payload) {
  */
 function clearAdminSession() {
   localStorage.removeItem('admin_token');
+  localStorage.removeItem('role');
 }
 
 /**
@@ -286,4 +298,110 @@ function getAdminAnalytics() {
     method: 'GET',
     headers: _adminHeaders(),
   });
+}
+
+/* ── Role Guards ──────────────────────────────────────────────────── */
+
+/**
+ * Redirect to admin-login.html if not logged in as admin.
+ * Call at the top of every admin page script.
+ */
+function guardAdmin() {
+  const role  = localStorage.getItem('role');
+  const token = localStorage.getItem('admin_token');
+  if (role !== 'admin' || !token) {
+    window.location.href = 'admin-login.html';
+  }
+}
+
+/**
+ * Redirect to login.html if not logged in as student.
+ * Call at the top of every student page script.
+ */
+function guardStudent() {
+  const role = localStorage.getItem('role');
+  const sid  = localStorage.getItem('student_id');
+  if (role !== 'student' || !sid) {
+    window.location.href = 'login.html';
+  }
+}
+
+/* ── Extended Admin API Functions ─────────────────────────────────── */
+
+/**
+ * Fetch admin today-attendance stats.
+ * @returns {Promise<{ok: boolean, data: any, message: string}>}
+ */
+function getAdminTodayAttendance() {
+  return _request('/api/admin/today-attendance', {
+    method: 'GET',
+    headers: _adminHeaders(),
+  });
+}
+
+/**
+ * Fetch all classes for admin.
+ * @returns {Promise<{ok: boolean, data: any, message: string}>}
+ */
+function getAdminClasses() {
+  return _request('/api/classes', {
+    method: 'GET',
+    headers: _adminHeaders(),
+  });
+}
+
+/**
+ * Create a new class.
+ * @param {{ class_name: string, subject: string, teacher_name: string, schedule_time: string }} payload
+ * @returns {Promise<{ok: boolean, data: any, message: string}>}
+ */
+function createClass(payload) {
+  return _request('/api/classes/create', {
+    method: 'POST',
+    headers: _adminHeaders(),
+    body: JSON.stringify(payload),
+  });
+}
+
+/**
+ * Fetch full attendance report for admin.
+ * @param {string} [date] - Optional ISO date string to filter by date
+ * @returns {Promise<{ok: boolean, data: any, message: string}>}
+ */
+function getAdminAttendanceReport(date) {
+  const query = date ? `?date=${encodeURIComponent(date)}` : '';
+  return _request(`/api/admin/attendance${query}`, {
+    method: 'GET',
+    headers: _adminHeaders(),
+  });
+}
+
+/**
+ * Get URL to download attendance CSV export.
+ * Triggers a file download in the browser.
+ */
+function exportAttendanceCsv() {
+  const token = localStorage.getItem('admin_token');
+  const url   = API_BASE + '/api/admin/export';
+  const a = document.createElement('a');
+  a.href = url + (token ? `?token=${encodeURIComponent(token)}` : '');
+  // Also set Authorization header via fetch and blob download as fallback
+  fetch(url, { method: 'GET', headers: _adminHeaders() })
+    .then((res) => {
+      if (!res.ok) throw new Error(`Export failed (${res.status})`);
+      return res.blob();
+    })
+    .then((blob) => {
+      const objectUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = objectUrl;
+      link.download = 'attendance_export.csv';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(objectUrl);
+    })
+    .catch((err) => {
+      console.error('CSV export error:', err);
+    });
 }

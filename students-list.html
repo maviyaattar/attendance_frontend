@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Students Management – Smart Location Based Attendance System." />
-  <title>Students – SmartAttend</title>
+  <meta name="description" content="Students List – Smart Location Based Attendance System." />
+  <title>Students List – SmartAttend</title>
 
   <!-- Bootstrap 5 -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
@@ -43,7 +43,7 @@
           </a>
         </li>
         <li>
-          <a href="students-list.html">
+          <a href="students-list.html" class="active" aria-current="page">
             <i class="bi bi-people"></i> Students
           </a>
         </li>
@@ -72,7 +72,7 @@
         </button>
         <div class="page-title">
           <i class="bi bi-people me-2" style="color:var(--primary);" aria-hidden="true"></i>
-          Students Management
+          Students
         </div>
         <span id="studentCount" style="font-size:.82rem; color:var(--text-muted-light);"></span>
       </header>
@@ -102,7 +102,7 @@
         <!-- Students content -->
         <div id="studentsContent" style="display:none;">
 
-          <!-- Search & Filter bar -->
+          <!-- Search bar -->
           <div class="glass-card p-3 mb-3 animate-fade-down">
             <div class="admin-search-wrap">
               <div class="search-icon-wrap">
@@ -111,13 +111,10 @@
                   type="search"
                   id="searchInput"
                   class="admin-search-input"
-                  placeholder="Search by name, email, roll no. or college ID…"
+                  placeholder="Search by name, email, or roll number…"
                   aria-label="Search students"
                 />
               </div>
-              <select id="branchFilter" class="admin-select" aria-label="Filter by branch">
-                <option value="">All Branches</option>
-              </select>
             </div>
             <p id="filterInfo" class="text-muted-light mb-0" style="font-size:.82rem;"></p>
           </div>
@@ -131,11 +128,8 @@
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
                     <th scope="col">Email</th>
-                    <th scope="col">College ID</th>
-                    <th scope="col">Roll No.</th>
+                    <th scope="col">Roll Number</th>
                     <th scope="col">Branch</th>
-                    <th scope="col">Attendance %</th>
-                    <th scope="col">Attended</th>
                   </tr>
                 </thead>
                 <tbody id="studentsTableBody"></tbody>
@@ -219,7 +213,7 @@
     /* ── All students (raw data) ── */
     let allStudents = [];
 
-    /* ── Render table rows from filtered list ── */
+    /* ── Render table rows ── */
     function renderTable(students) {
       const tbody   = document.getElementById('studentsTableBody');
       const noRec   = document.getElementById('noRecords');
@@ -238,16 +232,6 @@
       noRec.style.display = 'none';
 
       students.forEach((s, idx) => {
-        const pct     = parseFloat(s.attendancePercentage ?? s.attendance_percentage ?? 0).toFixed(1);
-        const attended = s.totalAttended ?? s.total_attended ?? s.attended ?? '—';
-        const pctNum  = parseFloat(pct);
-
-        const badgeColor = pctNum >= 75
-          ? 'var(--success)'
-          : pctNum >= 50
-            ? 'var(--warning)'
-            : 'var(--danger)';
-
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${idx + 1}</td>
@@ -258,15 +242,10 @@
             </div>
           </td>
           <td style="color:var(--text-muted-light); font-size:.85rem;">${s.email || '—'}</td>
-          <td>${s.college_id ?? s.collegeId ?? '—'}</td>
           <td>${s.roll_number ?? s.rollNumber ?? '—'}</td>
           <td>
             <span class="branch-badge">${s.branch || '—'}</span>
           </td>
-          <td>
-            <span style="color:${badgeColor}; font-weight:700;">${pct}%</span>
-          </td>
-          <td>${attended}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -274,37 +253,16 @@
 
     /* ── Filter students ── */
     function applyFilters() {
-      const query  = document.getElementById('searchInput').value.trim().toLowerCase();
-      const branch = document.getElementById('branchFilter').value.toLowerCase();
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
 
       const filtered = allStudents.filter((s) => {
-        const matchSearch = !query ||
+        return !query ||
           (s.name        || '').toLowerCase().includes(query) ||
           (s.email       || '').toLowerCase().includes(query) ||
-          String(s.roll_number  ?? s.rollNumber  ?? '').toLowerCase().includes(query) ||
-          String(s.college_id   ?? s.collegeId   ?? '').toLowerCase().includes(query);
-
-        const matchBranch = !branch || (s.branch || '').toLowerCase() === branch;
-
-        return matchSearch && matchBranch;
+          String(s.roll_number ?? s.rollNumber ?? '').toLowerCase().includes(query);
       });
 
       renderTable(filtered);
-    }
-
-    /* ── Populate branch filter dropdown ── */
-    function populateBranchFilter(students) {
-      const branches = [...new Set(
-        students.map((s) => s.branch).filter(Boolean)
-      )].sort();
-
-      const sel = document.getElementById('branchFilter');
-      branches.forEach((b) => {
-        const opt = document.createElement('option');
-        opt.value = b.toLowerCase();
-        opt.textContent = b;
-        sel.appendChild(opt);
-      });
     }
 
     /* ── Load students ── */
@@ -324,7 +282,6 @@
         return;
       }
 
-      /* Backend may return array directly or wrapped */
       const data = result.data;
       allStudents = Array.isArray(data)
         ? data
@@ -334,13 +291,11 @@
       document.getElementById('studentCount').textContent =
         `${allStudents.length} student${allStudents.length !== 1 ? 's' : ''}`;
 
-      populateBranchFilter(allStudents);
       renderTable(allStudents);
     }
 
-    /* ── Search / filter listeners ── */
+    /* ── Search listener ── */
     document.getElementById('searchInput').addEventListener('input', applyFilters);
-    document.getElementById('branchFilter').addEventListener('change', applyFilters);
 
     /* ── Logout ── */
     document.getElementById('logoutBtn').addEventListener('click', () => {

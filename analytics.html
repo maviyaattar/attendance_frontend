@@ -38,13 +38,18 @@
           </a>
         </li>
         <li>
-          <a href="students.html">
+          <a href="manage-classes.html">
+            <i class="bi bi-journal-bookmark"></i> Classes
+          </a>
+        </li>
+        <li>
+          <a href="students-list.html">
             <i class="bi bi-people"></i> Students
           </a>
         </li>
         <li>
-          <a href="analytics.html" class="active" aria-current="page">
-            <i class="bi bi-bar-chart-line"></i> Analytics
+          <a href="attendance-report.html">
+            <i class="bi bi-clipboard-data"></i> Attendance Report
           </a>
         </li>
       </ul>
@@ -173,7 +178,7 @@
     document.getElementById('footerYear').textContent = new Date().getFullYear();
 
     /* ── Auth guard ── */
-    if (!localStorage.getItem('admin_token')) {
+    if (!localStorage.getItem('admin_token') || localStorage.getItem('role') !== 'admin') {
       window.location.href = 'admin-login.html';
     }
 

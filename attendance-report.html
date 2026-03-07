@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Attendance Report – Smart Location Based Attendance System." />
+  <title>Attendance Report – SmartAttend</title>
+
+  <!-- Bootstrap 5 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="admin-body">
+
+  <!-- Toast container -->
+  <div class="toast-container-custom" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Sidebar overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+
+  <div class="admin-layout">
+
+    <!-- ── Sidebar ─────────────────────────────────────────────── -->
+    <aside class="admin-sidebar" id="adminSidebar" aria-label="Admin navigation">
+      <a class="sidebar-brand" href="admin-dashboard.html" aria-label="SmartAttend Admin home">
+        <i class="bi bi-geo-alt-fill"></i>
+        SmartAttend
+      </a>
+
+      <div class="sidebar-label">Main Menu</div>
+      <ul class="sidebar-nav">
+        <li>
+          <a href="admin-dashboard.html">
+            <i class="bi bi-speedometer2"></i> Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="manage-classes.html">
+            <i class="bi bi-journal-bookmark"></i> Classes
+          </a>
+        </li>
+        <li>
+          <a href="students-list.html">
+            <i class="bi bi-people"></i> Students
+          </a>
+        </li>
+        <li>
+          <a href="attendance-report.html" class="active" aria-current="page">
+            <i class="bi bi-clipboard-data"></i> Attendance Report
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-logout">
+        <button id="logoutBtn" class="btn-outline-custom w-100 justify-content-center"
+                style="font-size:.88rem; padding:.6rem 1rem;" aria-label="Logout">
+          <i class="bi bi-box-arrow-left me-1"></i> Logout
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── Main Content ──────────────────────────────────────────── -->
+    <div class="admin-main">
+
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+          <i class="bi bi-list"></i>
+        </button>
+        <div class="page-title">
+          <i class="bi bi-clipboard-data me-2" style="color:var(--secondary);" aria-hidden="true"></i>
+          Attendance Report
+        </div>
+        <button class="btn-success-custom" id="exportCsvBtn"
+                style="font-size:.82rem; padding:.45rem 1rem;" aria-label="Export attendance as CSV">
+          <i class="bi bi-download me-1"></i> Export CSV
+        </button>
+      </header>
+
+      <!-- Content -->
+      <div class="admin-content">
+
+        <!-- Filters bar -->
+        <div class="glass-card p-3 mb-3 animate-fade-down">
+          <div class="admin-search-wrap">
+            <div class="search-icon-wrap">
+              <i class="bi bi-search" aria-hidden="true"></i>
+              <input
+                type="search"
+                id="searchInput"
+                class="admin-search-input"
+                placeholder="Search by student name or roll number…"
+                aria-label="Search attendance records"
+              />
+            </div>
+            <div style="display:flex; align-items:center; gap:.5rem;">
+              <label for="dateFilter" style="font-size:.85rem; color:var(--text-muted-light); white-space:nowrap;">
+                <i class="bi bi-calendar3 me-1" aria-hidden="true"></i>Filter by date:
+              </label>
+              <input type="date" id="dateFilter" class="admin-input" aria-label="Filter by date" />
+              <button class="btn-outline-custom" id="clearDateBtn"
+                      style="font-size:.8rem; padding:.4rem .8rem;" aria-label="Clear date filter">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          </div>
+          <p id="filterInfo" class="text-muted-light mb-0" style="font-size:.82rem;"></p>
+        </div>
+
+        <!-- Loading state -->
+        <div id="loadingState" class="page-loading" aria-live="polite" aria-label="Loading attendance records">
+          <div class="spinner-custom" style="width:40px; height:40px; border-width:4px;" aria-hidden="true"></div>
+          <p class="text-muted-light">Loading attendance records…</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="errorState" style="display:none;" class="page-loading" aria-live="polite">
+          <div class="glass-card p-4 text-center" style="max-width:400px;">
+            <i class="bi bi-exclamation-triangle-fill"
+               style="font-size:2.5rem; color:var(--danger); display:block; margin-bottom:1rem;"
+               aria-hidden="true"></i>
+            <p id="errorMsg" class="text-muted-light mb-3">Failed to load attendance records.</p>
+            <button class="btn-primary-custom" onclick="loadReport()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Retry
+            </button>
+          </div>
+        </div>
+
+        <!-- Table content -->
+        <div id="reportContent" style="display:none;">
+          <div class="glass-card animate-fade-up" style="animation-delay:.1s;">
+            <div class="table-responsive-custom">
+              <table class="table-custom" aria-label="Attendance report">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Student Name</th>
+                    <th scope="col">Roll Number</th>
+                    <th scope="col">Class</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Time</th>
+                    <th scope="col">Latitude</th>
+                    <th scope="col">Longitude</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="reportTableBody"></tbody>
+              </table>
+
+              <!-- Empty state -->
+              <div id="noRecords" class="no-records" style="display:none;" aria-live="polite">
+                <i class="bi bi-calendar-x" aria-hidden="true"></i>
+                No attendance records found for the selected filters.
+              </div>
+            </div>
+          </div>
+        </div><!-- /#reportContent -->
+
+      </div><!-- /.admin-content -->
+
+      <!-- Footer -->
+      <footer class="footer-custom" role="contentinfo" style="margin-top:0;">
+        <div class="container-fluid px-4">
+          <p>&copy; <span id="footerYear"></span> <span class="text-gradient fw-600">SmartAttend</span></p>
+        </div>
+      </footer>
+
+    </div><!-- /.admin-main -->
+  </div><!-- /.admin-layout -->
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Shared config (API_BASE) -->
+  <script src="config.js"></script>
+  <!-- API -->
+  <script src="js/api.js"></script>
+
+  <script>
+    document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+    /* ── Auth guard ── */
+    if (!localStorage.getItem('admin_token') || localStorage.getItem('role') !== 'admin') {
+      window.location.href = 'admin-login.html';
+    }
+
+    /* ── Sidebar toggle ── */
+    const sidebar   = document.getElementById('adminSidebar');
+    const overlay   = document.getElementById('sidebarOverlay');
+    const toggleBtn = document.getElementById('sidebarToggle');
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+    });
+    overlay.addEventListener('click', closeSidebar);
+
+    /* ── Toast helper ── */
+    function showToast(msg, type = 'info') {
+      const icons = { success: 'bi-check-circle-fill', error: 'bi-x-circle-fill', info: 'bi-info-circle-fill' };
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast-custom ${type}`;
+      el.setAttribute('role', type === 'error' ? 'alert' : 'status');
+      el.innerHTML = `
+        <i class="bi ${icons[type] || icons.info} toast-icon" aria-hidden="true"></i>
+        <span class="toast-msg">${msg}</span>
+        <button class="toast-close" aria-label="Close notification">&times;</button>
+      `;
+      el.querySelector('.toast-close').addEventListener('click', () => el.remove());
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4500);
+    }
+
+    /* ── All records (raw) ── */
+    let allRecords = [];
+
+    /* ── Format date / time ── */
+    function fmtDate(val) {
+      if (!val) return '—';
+      const d = new Date(val);
+      return isNaN(d.getTime()) ? val : d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function fmtTime(rec) {
+      if (rec.time) return rec.time;
+      if (rec.date || rec.timestamp) {
+        const d = new Date(rec.date ?? rec.timestamp);
+        return isNaN(d.getTime()) ? '—' : d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+      }
+      return '—';
+    }
+
+    /* ── Render table ── */
+    function renderTable(records) {
+      const tbody  = document.getElementById('reportTableBody');
+      const noRec  = document.getElementById('noRecords');
+      const infoEl = document.getElementById('filterInfo');
+      tbody.innerHTML = '';
+
+      const total = allRecords.length;
+      infoEl.textContent = records.length === total
+        ? `${total} record${total !== 1 ? 's' : ''} total`
+        : `Showing ${records.length} of ${total} records`;
+
+      if (records.length === 0) {
+        noRec.style.display = 'block';
+        return;
+      }
+      noRec.style.display = 'none';
+
+      records.forEach((r, idx) => {
+        const studentName = r.student_name ?? r.studentName ?? r.name ?? '—';
+        const rollNumber  = r.roll_number  ?? r.rollNumber  ?? '—';
+        const className   = r.class_name   ?? r.className   ?? r.class ?? '—';
+        const dateVal     = r.date ?? r.timestamp ?? null;
+        const lat  = r.latitude  != null ? parseFloat(r.latitude).toFixed(6)  : '—';
+        const lng  = r.longitude != null ? parseFloat(r.longitude).toFixed(6) : '—';
+        const status = (r.status || 'present').toLowerCase();
+        const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+        const dotIcon = status === 'present' ? 'bi-circle-fill' : (status === 'late' ? 'bi-clock-fill' : 'bi-x-circle-fill');
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td>
+            <div class="student-name-cell">
+              <div class="student-avatar">${(studentName).charAt(0).toUpperCase()}</div>
+              <span>${studentName}</span>
+            </div>
+          </td>
+          <td>${rollNumber}</td>
+          <td>${className}</td>
+          <td>${fmtDate(dateVal)}</td>
+          <td>${fmtTime(r)}</td>
+          <td style="font-size:.82rem; color:var(--text-muted-light);">${lat}</td>
+          <td style="font-size:.82rem; color:var(--text-muted-light);">${lng}</td>
+          <td>
+            <span class="status-badge ${status}" role="status">
+              <i class="bi ${dotIcon}" aria-hidden="true"></i>
+              ${statusLabel}
+            </span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* ── Apply search + date filter (client-side) ── */
+    function applyFilters() {
+      const query     = document.getElementById('searchInput').value.trim().toLowerCase();
+      const dateValue = document.getElementById('dateFilter').value; // YYYY-MM-DD
+
+      const filtered = allRecords.filter((r) => {
+        const matchSearch = !query ||
+          (r.student_name ?? r.studentName ?? r.name ?? '').toLowerCase().includes(query) ||
+          String(r.roll_number ?? r.rollNumber ?? '').toLowerCase().includes(query);
+
+        let matchDate = true;
+        if (dateValue) {
+          const recDate = r.date ?? r.timestamp ?? null;
+          if (recDate) {
+            const d = new Date(recDate);
+            const recDateStr = isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
+            matchDate = recDateStr === dateValue;
+          } else {
+            matchDate = false;
+          }
+        }
+
+        return matchSearch && matchDate;
+      });
+
+      renderTable(filtered);
+    }
+
+    /* ── Load report data ── */
+    async function loadReport() {
+      const dateValue = document.getElementById('dateFilter').value;
+
+      document.getElementById('loadingState').style.display  = 'flex';
+      document.getElementById('errorState').style.display    = 'none';
+      document.getElementById('reportContent').style.display = 'none';
+
+      const result = await getAdminAttendanceReport(dateValue || null);
+
+      document.getElementById('loadingState').style.display = 'none';
+
+      if (!result.ok) {
+        document.getElementById('errorMsg').textContent = result.message || 'Failed to load attendance records.';
+        document.getElementById('errorState').style.display = 'flex';
+        showToast(result.message || 'Failed to load report', 'error');
+        return;
+      }
+
+      const data = result.data;
+      allRecords = Array.isArray(data) ? data : (data.attendance ?? data.records ?? data.data ?? []);
+
+      document.getElementById('reportContent').style.display = 'block';
+      applyFilters();
+    }
+
+    /* ── Search listener ── */
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+    /* ── Date filter listener – reload from server if backend supports query param ── */
+    document.getElementById('dateFilter').addEventListener('change', () => {
+      loadReport();
+    });
+
+    /* ── Clear date filter ── */
+    document.getElementById('clearDateBtn').addEventListener('click', () => {
+      document.getElementById('dateFilter').value = '';
+      loadReport();
+    });
+
+    /* ── Export CSV ── */
+    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+      showToast('Preparing CSV download…', 'info');
+      exportAttendanceCsv();
+    });
+
+    /* ── Logout ── */
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      clearAdminSession();
+      showToast('Logged out successfully', 'info');
+      setTimeout(() => { window.location.href = 'admin-login.html'; }, 800);
+    });
+
+    /* ── Init ── */
+    loadReport();
+  </script>
+
+</body>
+</html>
